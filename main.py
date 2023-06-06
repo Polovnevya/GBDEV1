@@ -1,16 +1,29 @@
-# This is a sample Python script.
-
-# Press Shift+F10 to execute it or replace it with your code.
-# Press Double Shift to search everywhere for classes, files, tool windows, actions, and settings.
-
-
-def print_hi(name):
-    # Use a breakpoint in the code line below to debug your script.
-    print(f'Hi, {name}')  # Press Ctrl+F8 to toggle the breakpoint.
+import asyncio
+import logging
+from keyboards.set_menu import set_main_menu
+from loader import dp, logger, bot
 
 
-# Press the green button in the gutter to run the script.
+
+# Функция конфигурирования и запуска бота
+async def main():
+    # Конфигурируем логирование
+    logging.basicConfig(
+        level=logging.INFO,
+        format='%(filename)s:%(lineno)d #%(levelname)-8s '
+               '[%(asctime)s] - %(name)s - %(message)s')
+
+    # Выводим в консоль информацию о начале запуска бота
+    logger.info('Starting bot')
+
+    # Настраиваем главное меню бота
+    await set_main_menu(bot)
+
+
+    # Пропускаем накопившиеся апдейты и запускаем polling
+    await bot.delete_webhook(drop_pending_updates=True)
+    await dp.start_polling(bot)
+
+
 if __name__ == '__main__':
-    print_hi('PyCharm')
-
-# See PyCharm help at https://www.jetbrains.com/help/pycharm/
+    asyncio.run(main())
