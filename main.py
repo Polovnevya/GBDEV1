@@ -1,5 +1,7 @@
 import asyncio
 import logging
+
+import handlers
 from keyboards.set_menu import set_main_menu
 from loader import dp, logger, bot
 
@@ -19,6 +21,8 @@ async def main():
     # Настраиваем главное меню бота
     await set_main_menu(bot)
 
+    # Регистриуем роутеры в диспетчере
+    dp.include_router(handlers.common.echo.router)
 
     # Пропускаем накопившиеся апдейты и запускаем polling
     await bot.delete_webhook(drop_pending_updates=True)
