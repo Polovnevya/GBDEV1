@@ -3,10 +3,12 @@ import logging
 from config.config import config
 
 # Инициализируем логгер
+from db.sql_facade import SqlHelper
+
 logger = logging.getLogger(__name__)
 
 # Инициализируем базу данных
-#db: DataBase = DataBase(config.db.database)
+db: SqlHelper = SqlHelper(config.db.database)
 
 # Инициализируем бот и диспетчер
 bot: Bot = Bot(token=config.tg_bot.token,
