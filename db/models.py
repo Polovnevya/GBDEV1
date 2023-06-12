@@ -5,13 +5,10 @@ from sqlalchemy import Integer, String, DateTime, ForeignKey
 from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column, validates
 from sqlalchemy.orm import relationship
 from datetime import datetime
-
 import enum
 from sqlalchemy_utils import EmailType, PhoneNumberType
 from validate_email import validate_email
 
-
-# engine = create_async_engine("postgresql+asyncpg://postgres:postgres@localhost/gbdev1", echo=True)
 
 class Base(DeclarativeBase):
     pass
@@ -189,5 +186,3 @@ class Post(Base, DateBaseModel):
     def __repr__(self):
         return f"<id: {self.id}, vacancy_id: {self.vacancy_id.key}, channel_id {self.channel_id}, " \
                f"created_at: {self.created_at}, updated_at: {self.updated_at}, deleted_at: {self.updated_at}>"
-
-
