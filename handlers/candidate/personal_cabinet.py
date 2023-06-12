@@ -1,10 +1,11 @@
 from aiogram import Router, F
+from aiogram.enums import ContentType
 from aiogram.filters import Command, StateFilter
 from aiogram.fsm.context import FSMContext
-from aiogram.fsm.state import default_state
-from aiogram.types import Message, ReplyKeyboardMarkup, CallbackQuery
+from aiogram.types import Message, CallbackQuery, ReplyKeyboardRemove
 
 from db.models import GenderEnum, AgeCategoriesEnum, EducationEnum
+from keyboards.candidate import kb_contact, kb_geo
 from keyboards.inline.candidate import get_gender_keyboard_fab, GenderCallback, AgeCallback, get_age_keyboard_fab, \
     EducationCallback, get_education_keyboard_fab
 from states.candidate import FSMCandidatePoll
@@ -12,12 +13,14 @@ from states.candidate import FSMCandidatePoll
 candidate_pc_router: Router = Router()
 
 
-@candidate_pc_router.message(Command(commands=['bot']), StateFilter(default_state))
+@candidate_pc_router.message(Command(commands=['bot']))  # , StateFilter(default_state))
 async def process_start_command(message: Message, state: FSMContext):
     await state.clear()
+    # TODO если кандидат уже есть в базе - пропускаем анкетирование,
+    # запрашиваем корректность данных и устанавливаем состояние геолокации
     await message.answer(f"Добрый день {message.from_user.full_name}!\n"
                          f"Для создания отклика пройдите небольшой анкетирование")
-    await message.answer(f"Введите Ваше имя")
+    await message.answer(f"Введите Ваше имя", reply_markup=ReplyKeyboardRemove())
     await state.set_state(FSMCandidatePoll.first_name)
 
 
@@ -62,13 +65,30 @@ async def process_get_age(query: CallbackQuery, callback_data: AgeCallback, stat
 @candidate_pc_router.callback_query(EducationCallback.filter(), StateFilter(FSMCandidatePoll.education))
 async def process_get_education(query: CallbackQuery, callback_data: EducationCallback, state: FSMContext):
     await state.update_data({"education": callback_data.value})
-    tmp = await state.get_data()
-    await query.message.answer(f"это мы потом заменим\n"
-                               f"Ваши данные для занесения в базу кандидатов:\n"
-                               f"{tmp}")
-    await query.message.answer("Отправьте свой номер телефона",)
-    await state.set_state(FSMCandidatePoll.education)
+    await query.message.answer("Отправьте свой номер телефона", reply_markup=kb_contact)
+    await state.set_state(FSMCandidatePoll.phone)
 
+
+@candidate_pc_router.message(StateFilter(FSMCandidatePoll.phone), F.content_type.in_({ContentType.CONTACT}))
+async def process_get_phone(message: Message, state: FSMContext):
+    await state.update_data({"phone": message.contact.phone_number})
+    await state.update_data({"tg_id": message.from_user.id})
+    # TODO Произвести запись в базу даных
+    tmp = await  state.get_data()
+    await message.answer(f"Тут производим запись кандидата в бд,\n"
+                         f"{tmp}")
+    await message.answer("Спасибо что прошли опрос!\n"
+                         "Для дальнейшего поиска открытых вакансий - "
+                         "отправьте свою геолокацию и бот подберет для вас самые ближайшие варианты",
+                         reply_markup=kb_geo)
+    await state.set_state(FSMCandidatePoll.geolocation)
+
+
+@candidate_pc_router.message(StateFilter(FSMCandidatePoll.geolocation), F.content_type.in_({ContentType.LOCATION}))
+async def process_get_phone(message: Message, state: FSMContext):
+    await state.update_data({"phone": message.contact.phone_number})
+    await message.answer("Отправьте свою геолокацию", reply_markup=kb_geo)
+    await state.set_state(FSMCandidatePoll.geolocation)
 
 
 @candidate_pc_router.message()

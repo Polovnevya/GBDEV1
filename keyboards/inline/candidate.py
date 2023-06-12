@@ -1,4 +1,4 @@
-from typing import Optional
+from typing import Optional, Type
 from aiogram.filters.callback_data import CallbackData
 from aiogram.utils.keyboard import InlineKeyboardBuilder
 
@@ -20,7 +20,7 @@ class EducationCallback(CallbackData, prefix="EC"):
     value: Optional[str]
 
 
-def get_education_keyboard_fab(educations: EducationEnum):
+def get_education_keyboard_fab(educations: Type[EducationEnum]):
     builder = InlineKeyboardBuilder()
     for education in educations:
         builder.button(
@@ -30,7 +30,10 @@ def get_education_keyboard_fab(educations: EducationEnum):
     return builder.as_markup()
 
 
-def get_age_keyboard_fab(ages: AgeCategoriesEnum):
+Type[AgeCategoriesEnum]
+
+
+def get_age_keyboard_fab(ages: Type[AgeCategoriesEnum]):
     builder = InlineKeyboardBuilder()
     for age in ages:
         builder.button(
@@ -40,7 +43,7 @@ def get_age_keyboard_fab(ages: AgeCategoriesEnum):
     return builder.as_markup()
 
 
-def get_gender_keyboard_fab(genders: GenderEnum):
+def get_gender_keyboard_fab(genders: Type[GenderEnum]):
     builder = InlineKeyboardBuilder()
     for gender in genders:
         builder.button(

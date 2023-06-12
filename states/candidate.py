@@ -8,3 +8,7 @@ class FSMCandidatePoll(StatesGroup):
     gender = State()
     age = State()
     education = State()
+    email = State()
+    phone = State()
+    geolocation = State()
+

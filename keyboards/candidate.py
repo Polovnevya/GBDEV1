@@ -1,9 +1,27 @@
-from aiogram import types
+from aiogram.types import ReplyKeyboardMarkup, KeyboardButton, KeyboardButtonPollType
+from aiogram.utils.keyboard import ReplyKeyboardBuilder
 
-button_phone = types.KeyboardButton(text="Отправить контакт", request_contact=True)
-keyboard_phone = types.ReplyKeyboardMarkup(row_width=1, resize_keyboard=True)
-keyboard_phone.add(button_phone)
+# Создаем кнопки
+contact_btn: KeyboardButton = KeyboardButton(
+    text='Отправить телефон',
+    request_contact=True)
 
-button_geo = types.KeyboardButton(text="Отправить геолокацию", request_location=True)
-keyboard_geo = types.ReplyKeyboardMarkup(row_width=1, resize_keyboard=True)
-keyboard_geo.add(button_phone)
+geo_btn: KeyboardButton = KeyboardButton(
+    text='Отправить геолокацию',
+    request_location=True)
+
+# Инициализируем билдер
+kb_contact_builder: ReplyKeyboardBuilder = ReplyKeyboardBuilder()
+kb_geo_builder: ReplyKeyboardBuilder = ReplyKeyboardBuilder()
+
+# Добавляем кнопки в билдер
+kb_contact_builder.row(contact_btn, width=1)
+kb_geo_builder.row(geo_btn, width=1)
+
+# Создаем объект клавиатуры
+kb_contact: ReplyKeyboardMarkup = kb_contact_builder.as_markup(
+    resize_keyboard=True,
+    one_time_keyboard=True)
+kb_geo: ReplyKeyboardMarkup = kb_geo_builder.as_markup(
+    resize_keyboard=True,
+    one_time_keyboard=True)
