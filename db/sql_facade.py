@@ -2,17 +2,18 @@ from sqlalchemy.ext.asyncio import create_async_engine, async_sessionmaker, engi
 import asyncio
 from models import Base, Candidate, Employer, Audience, Vacancy, Feedback, Post, Channel
 from fixtures import fixtures
-from settings import connection_string
+from config.config import Config
 
 
 class SqlManage:
-    def __init__(self):
+    def __init__(self, config):
         self.async_engine = None
         self.async_session = None
+        self.connection_string = f"postgresql+asyncpg://{config.db.db_user}:{config.db.db_password}@{config.db.db_host}/{config.db.database}"
 
     async def create_async_engine(self) -> engine.AsyncEngine:
         self.async_engine = create_async_engine(
-            connection_string,
+            self.connection_string,
             echo=True
         )
         return self.async_engine
@@ -36,9 +37,8 @@ class SqlManage:
 
 
 class SqlHelper:
-
-    def __init__(self):
-        self.sm = SqlManage()
+    def __init__(self, config: Config):
+        self.sm = SqlManage(config)
 
     async def insert_objects(self, datas: dict) -> None:
         await self.sm.create_async_engine()
@@ -66,10 +66,6 @@ class SqlHelper:
                     ]
                 )
 
-
-async def main() -> None:
-    sh = SqlHelper()
-    await sh.insert_objects(fixtures)
-
-
-asyncio.run(main())
+# async def main() -> None:
+#     sh = SqlHelper()
+#     await sh.insert_objects(fixtures)
