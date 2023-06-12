@@ -2,30 +2,49 @@ from typing import Optional
 from aiogram.filters.callback_data import CallbackData
 from aiogram.utils.keyboard import InlineKeyboardBuilder
 
-from db.models import GenderEnum
+from db.models import GenderEnum, EducationEnum, AgeCategoriesEnum
 
 
-class GenderCallbackFactory(CallbackData, prefix="GCF"):
+class GenderCallback(CallbackData, prefix="GC"):
     action: str
-    value: Optional[int]
+    value: Optional[str]
 
 
-class AgeCallbackFactory(CallbackData, prefix="ACF"):
+class AgeCallback(CallbackData, prefix="AC"):
     action: str
-    value: Optional[int]
+    value: Optional[str]
 
 
-class EducationCallbackFactory(CallbackData, prefix="ECF"):
+class EducationCallback(CallbackData, prefix="EC"):
     action: str
-    value: Optional[int]
+    value: Optional[str]
+
+
+def get_education_keyboard_fab(educations: EducationEnum):
+    builder = InlineKeyboardBuilder()
+    for education in educations:
+        builder.button(
+            text=f"{education.value}", callback_data=EducationCallback(action="EC", value=education.name)
+        )
+    builder.adjust(1)
+    return builder.as_markup()
+
+
+def get_age_keyboard_fab(ages: AgeCategoriesEnum):
+    builder = InlineKeyboardBuilder()
+    for age in ages:
+        builder.button(
+            text=f"{age.value}", callback_data=AgeCallback(action="AC", value=age.name)
+        )
+    builder.adjust(1)
+    return builder.as_markup()
 
 
 def get_gender_keyboard_fab(genders: GenderEnum):
     builder = InlineKeyboardBuilder()
     for gender in genders:
         builder.button(
-        text=f"{gender.value}", callback_data=GenderCallbackFactory(action="GCF", value=gender)
-    )
-    # Выравниваем кнопки по 4 в ряд, чтобы получилось 4 + 1
-    builder.adjust(4)
+            text=f"{gender.value}", callback_data=GenderCallback(action="GC", value=gender.name)
+        )
+    builder.adjust(1)
     return builder.as_markup()

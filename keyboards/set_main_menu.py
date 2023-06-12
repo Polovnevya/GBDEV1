@@ -7,3 +7,4 @@ async def set_main_menu(bot: Bot):
     main_menu_commands = [BotCommand(command="/bot", description="Запустить бота"),
                           ]
     await bot.set_my_commands(main_menu_commands)
+

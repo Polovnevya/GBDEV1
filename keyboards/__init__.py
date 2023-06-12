@@ -1,3 +1,3 @@
 from . import inline
-from . import set_menu
+from . import set_main_menu
 

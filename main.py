@@ -3,7 +3,7 @@ import logging
 
 import handlers
 from db.fixtures import fixtures
-from keyboards.set_menu import set_main_menu
+from keyboards.set_main_menu import set_main_menu
 from loader import dp, logger, bot, db
 
 
