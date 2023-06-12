@@ -1,4 +1,4 @@
-from models import EducationEnum, AgeCategoriesEnum, GenderEnum, WorkScheduleEnum, EmploymentEnum
+from .models import EducationEnum, AgeCategoriesEnum, GenderEnum, WorkScheduleEnum, EmploymentEnum
 from datetime import datetime, timedelta
 
 fixtures = {

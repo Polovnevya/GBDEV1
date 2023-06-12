@@ -2,13 +2,17 @@ import asyncio
 import logging
 
 import handlers
+from db.fixtures import fixtures
 from keyboards.set_menu import set_main_menu
-from loader import dp, logger, bot
-
+from loader import dp, logger, bot, db
 
 
 # Функция конфигурирования и запуска бота
 async def main():
+    #Создает таблицы в бд
+    await db.insert_objects(fixtures)
+
+
     # Конфигурируем логирование
     logging.basicConfig(
         level=logging.INFO,
