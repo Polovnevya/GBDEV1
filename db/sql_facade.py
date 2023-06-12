@@ -34,11 +34,12 @@ class SqlManage:
             raise ValueError("engin not created")
         self.async_session = async_sessionmaker(self.async_engine, expire_on_commit=False)
 
-
+#TODO Антон - переписать скрытую зависимость  self.sm: SqlManage, на DI
 class SqlHelper:
     def __init__(self, config: Config):
         self.sm: SqlManage = SqlManage(config)
 
+    # TODO Антон - переписать, разбить метод на отедбные - 1) проверка на наличие и создание таблиц 2) И метод загрузки фикстур
     async def insert_objects(self, datas: dict) -> None:
         await self.sm.create_async_engine()
         await self.sm.drop_all_tables()

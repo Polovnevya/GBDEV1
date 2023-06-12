@@ -168,6 +168,7 @@ class Channel(Base, DateBaseModel):
     __tablename__ = "channels"
 
     id: Mapped[int] = mapped_column(Integer, primary_key=True)
+    #TODO Антон - добавить chanel_id
     name: Mapped[str] = mapped_column(String, nullable=False)
     audience: Mapped[List[Audience]] = relationship(secondary=channel_to_audience)
 
@@ -180,6 +181,7 @@ class Post(Base, DateBaseModel):
     __tablename__ = "posts"
 
     id: Mapped[int] = mapped_column(Integer, primary_key=True)
+    #TODO Антон - добавить message_id
     vacancy_id: Mapped[int] = mapped_column(ForeignKey("vacancies.id"), nullable=False)
     channel_id: Mapped[int] = mapped_column(ForeignKey("channels.id"), nullable=False)
 
