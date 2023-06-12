@@ -5,7 +5,6 @@ from config.config import config
 # Инициализируем логгер
 logger = logging.getLogger(__name__)
 
-
 # Инициализируем базу данных
 #db: DataBase = DataBase(config.db.database)
 
@@ -13,3 +12,4 @@ logger = logging.getLogger(__name__)
 bot: Bot = Bot(token=config.tg_bot.token,
                parse_mode='HTML')
 dp: Dispatcher = Dispatcher()
+
