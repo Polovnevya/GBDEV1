@@ -55,7 +55,7 @@ class DateBaseModel:
 class ContactBaseModel:
     email: Mapped[EmailType] = mapped_column(EmailType, nullable=False, unique=True)
     phone: Mapped[PhoneNumberType] = mapped_column(
-        PhoneNumberType(region="RU", check_region=True, max_length=11),
+        PhoneNumberType(region="RU", check_region=True, max_length=12),
         nullable=False,
         unique=True,
     )
@@ -71,7 +71,7 @@ class Candidate(Base, ContactBaseModel, DateBaseModel):
     __tablename__ = "candidates"
 
     id: Mapped[int] = mapped_column(primary_key=True)
-    candidate: Mapped[List["Feedback"]] = relationship()
+    feedback: Mapped[List["Feedback"]] = relationship()
     user_name: Mapped[str] = mapped_column(String, unique=True, nullable=False)
     user_id: Mapped[int] = mapped_column(unique=True, nullable=False)
     chat_id: Mapped[int] = mapped_column(unique=True, nullable=False)
@@ -95,18 +95,18 @@ class Audience(Base, DateBaseModel):
 
     id: Mapped[int] = mapped_column(primary_key=True)
     name: Mapped[str] = mapped_column(String, nullable=False)
-    audience: Mapped[List["Vacancy"]] = relationship()
+    vacancy: Mapped[List["Vacancy"]] = relationship()
 
     def __repr__(self):
         return f"<id: {self.id}, name: {self.name},  " \
                f"created_at: {self.created_at}, updated_at: {self.updated_at}, deleted_at: {self.updated_at}>"
 
 
-class Employer(Base, DateBaseModel):
+class Employer(Base, ContactBaseModel, DateBaseModel):
     __tablename__ = "employers"
 
     id: Mapped[int] = mapped_column(primary_key=True)
-    employer: Mapped[List["Vacancy"]] = relationship()
+    vacancy: Mapped[List["Vacancy"]] = relationship()
     user_name: Mapped[str] = mapped_column(String(50), unique=True, nullable=False)
     user_id: Mapped[int] = mapped_column(unique=True, nullable=False)
     chat_id: Mapped[int] = mapped_column(unique=True, nullable=False)
@@ -123,8 +123,8 @@ class Vacancy(Base, DateBaseModel):
     __tablename__ = "vacancies"
 
     id: Mapped[int] = mapped_column(Integer, primary_key=True)
-    vacancy: Mapped[List["Feedback"]] = relationship()
-    vacancy: Mapped[List["Post"]] = relationship()
+    feedback: Mapped[List["Feedback"]] = relationship()
+    post: Mapped[List["Post"]] = relationship()
     name: Mapped[str] = mapped_column(String, nullable=False)
     employer_id: Mapped[int] = mapped_column(ForeignKey("employers.id"), nullable=False)
     audience_id: Mapped[int] = mapped_column(ForeignKey("audiences.id"), nullable=False)
@@ -137,7 +137,7 @@ class Vacancy(Base, DateBaseModel):
     date_end: Mapped[datetime] = mapped_column(DateTime)
 
     def __repr__(self):
-        return f"<id: {self.id}, vacancy_name: {self.vacancy_name}, employer_id: {self.employer_id}, " \
+        return f"<id: {self.id}, vacancy_name: {self.name}, employer_id: {self.employer_id}, " \
                f"audience_id: {self.audience_id}, work_schedule: {self.work_schedule}, salary: {self.salary}, " \
                f"geolocation: {self.geolocation}, is_open: {self.is_open}, " \
                f" date_start: {self.date_start}, date_end: {self.date_end}, " \
@@ -159,8 +159,8 @@ class Feedback(Base, DateBaseModel):
 channel_to_audience = Table(
     "channel_to_audience",
     Base.metadata,
-    Column("channel_id", ForeignKey("channels.id")),
-    Column("audience_id", ForeignKey("audiences.id")),
+    Column("channel_id", ForeignKey("channels.id"), primary_key=True),
+    Column("audience_id", ForeignKey("audiences.id"), primary_key=True),
 )
 
 
