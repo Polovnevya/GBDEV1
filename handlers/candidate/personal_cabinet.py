@@ -8,20 +8,24 @@ from db.models import GenderEnum, AgeCategoriesEnum, EducationEnum
 from keyboards.candidate import kb_contact, kb_geo
 from keyboards.inline.candidate import get_gender_keyboard_fab, GenderCallback, AgeCallback, get_age_keyboard_fab, \
     EducationCallback, get_education_keyboard_fab
+from loader import db
 from states.candidate import FSMCandidatePoll
 
 candidate_pc_router: Router = Router()
 
 
 @candidate_pc_router.message(Command(commands=['bot']))  # , StateFilter(default_state))
-async def process_start_command(message: Message, state: FSMContext):
+async def process_start_command(message: Message, state: FSMContext,):
     await state.clear()
     # TODO если кандидат уже есть в базе - пропускаем анкетирование,
-    # запрашиваем корректность данных и устанавливаем состояние геолокации
-    await message.answer(f"Добрый день {message.from_user.full_name}!\n"
-                         f"Для создания отклика пройдите небольшой анкетирование")
-    await message.answer(f"Введите Ваше имя", reply_markup=ReplyKeyboardRemove())
-    await state.set_state(FSMCandidatePoll.first_name)
+    result = await db.get_candidate_by_id(message.from_user.id)
+    if not result:
+        await message.answer(f"Добрый день {message.from_user.full_name}!\n"
+                             f"Для создания отклика пройдите небольшой анкетирование")
+        await message.answer(f"Введите Ваше имя", reply_markup=ReplyKeyboardRemove())
+        await state.set_state(FSMCandidatePoll.first_name)
+    else:
+        pass
 
 
 @candidate_pc_router.message(F.text, StateFilter(FSMCandidatePoll.first_name))

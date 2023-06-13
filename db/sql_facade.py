@@ -34,7 +34,8 @@ class SqlManage:
             raise ValueError("engin not created")
         self.async_session = async_sessionmaker(self.async_engine, expire_on_commit=False)
 
-#TODO Антон - переписать скрытую зависимость  self.sm: SqlManage, на DI
+
+# TODO Антон - переписать скрытую зависимость  self.sm: SqlManage, на DI
 class SqlHelper:
     def __init__(self, config: Config):
         self.sm: SqlManage = SqlManage(config)
@@ -65,6 +66,44 @@ class SqlHelper:
                         *posts,
                     ]
                 )
+
+    async def get_candidate_by_id(self, candidate_tg_id: int) -> dict | False:
+        """
+        ищет по tg_id кандидата, если он не удален
+        :param candidate_tg_id:
+        :return: возвращает данные кандидата в виде словаря если он имеется в таблице и False если такого кандидата в базе нет
+        """
+        pass
+
+    async def insert_or_update_candidate(self, candidate_data: dict) -> None:
+        """
+        Принимает словарь с данными кандидата
+            {'first_name': 'ф',
+            'middle_name': 'ы',
+            'last_name': 'в',
+            'gender': 'female',
+            'age': 'senior',
+            'education': 'higher',
+            'phone': '+79134903369',
+            'tg_id': 618432846}
+
+        производит добавление кандидата если его нет
+        и
+        обновляет данные кандидата если он уже есть в базе
+        можно разбить на 2 метода добавление и обновление, а этот использовать как фасад
+
+        :param candidate_data:
+        :return:
+        """
+        pass
+
+    async def get_active_employers_by_id(self) -> list[int]:
+        """
+        1) не удален
+        :param employer_tg_id:
+        :return:
+        """
+        pass
 
 # async def main() -> None:
 #     sh = SqlHelper()

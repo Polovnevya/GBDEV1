@@ -68,6 +68,7 @@ class ContactBaseModel:
 
 
 class Candidate(Base, ContactBaseModel, DateBaseModel):
+    #TODO Убрать почту у кандидата, оставить только номер телефона. никто почту писать не будет
     __tablename__ = "candidates"
 
     id: Mapped[int] = mapped_column(primary_key=True)
