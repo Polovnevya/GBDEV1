@@ -1,3 +1,5 @@
+from typing import Union
+
 from sqlalchemy.ext.asyncio import create_async_engine, async_sessionmaker, engine
 from .models import Base, Candidate, Employer, Audience, Vacancy, Feedback, Post, Channel
 from .fixtures import fixtures
@@ -68,13 +70,21 @@ class SqlHelper:
                 )
 
     #TODO запилить реализацию
-    async def get_candidate_by_id(self, candidate_tg_id: int) -> dict | False:
+    async def get_candidate_by_id(self, candidate_tg_id: int) -> Union[dict, bool]:
         """
         ищет по tg_id кандидата, если он не удален
         :param candidate_tg_id:
         :return: возвращает данные кандидата в виде словаря если он имеется в таблице и False если такого кандидата в базе нет
         """
-        pass
+        return {'first_name': 'Юрий',
+            'middle_name': 'Андреевич',
+            'last_name': 'Половнев',
+            'gender': 'male',
+            'age': 'senior',      # тут должны быть значения энамов, а не ключи
+            'education': 'higher',
+            'phone': '+79134903369',
+            'tg_id': 618432846}
+
     #TODO запилить реализацию
     async def insert_or_update_candidate(self, candidate_data: dict) -> None:
         """

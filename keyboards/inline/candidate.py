@@ -63,5 +63,5 @@ def get_personal_data_keyboard():
     builder.button(
         text=f"Нет", callback_data=PersonalData(action="No", value="0")
     )
-    builder.adjust(1)
+    builder.adjust(2)
     return builder.as_markup()
