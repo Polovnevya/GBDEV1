@@ -7,7 +7,7 @@ from aiogram.types import Message, CallbackQuery, ReplyKeyboardRemove
 from db.models import GenderEnum, AgeCategoriesEnum, EducationEnum
 from keyboards.candidate import kb_contact, kb_geo
 from keyboards.inline.candidate import get_gender_keyboard_fab, GenderCallback, AgeCallback, get_age_keyboard_fab, \
-    EducationCallback, get_education_keyboard_fab
+    EducationCallback, get_education_keyboard_fab, get_personal_data_keyboard, PersonalData
 from loader import db
 from states.candidate import FSMCandidatePoll
 
@@ -15,17 +15,44 @@ candidate_pc_router: Router = Router()
 
 
 @candidate_pc_router.message(Command(commands=['bot']))  # , StateFilter(default_state))
-async def process_start_command(message: Message, state: FSMContext,):
+async def process_start_command(message: Message, state: FSMContext, ):
     await state.clear()
+    await message.answer(f"Добрый день {message.from_user.full_name}!\n"
+                         f"Для создания отклика пройдите небольшой анкетирование",
+                         reply_markup=ReplyKeyboardRemove())
+
     # TODO если кандидат уже есть в базе - пропускаем анкетирование,
     result = await db.get_candidate_by_id(message.from_user.id)
     if not result:
-        await message.answer(f"Добрый день {message.from_user.full_name}!\n"
-                             f"Для создания отклика пройдите небольшой анкетирование")
-        await message.answer(f"Введите Ваше имя", reply_markup=ReplyKeyboardRemove())
+        await message.answer(f"Введите Ваше имя")
         await state.set_state(FSMCandidatePoll.first_name)
     else:
-        pass
+        await message.answer(f"Это корректные данные?\n"
+                             f"Имя: {result.get('first_name')} \n"
+                             f"Отчество: {result.get('middle_name')} \n"
+                             f"Фамилия: {result.get('last_name')} \n"
+                             f"Пол: {result.get('gender')} \n"
+                             f"Возраст: {result.get('age')} \n"
+                             f"Образование: {result.get('education')} \n"
+                             f"Телефон: {result.get('phone')}",
+                             reply_markup=get_personal_data_keyboard())
+        await state.set_state(FSMCandidatePoll.load_pd)
+
+
+@candidate_pc_router.callback_query(PersonalData.filter(), StateFilter(FSMCandidatePoll.load_pd))
+async def process_candidate_pd(query: CallbackQuery, callback_data: EducationCallback, state: FSMContext):
+
+    if callback_data.value == '0':
+        await state.clear()
+        await query.message.answer(f"Добрый день {query.from_user.full_name}!\n"
+                                   f"Для создания отклика пройдите небольшой анкетирование")
+        await query.message.answer(f"Введите Ваше имя", reply_markup=ReplyKeyboardRemove())
+        query.answer()
+        await state.set_state(FSMCandidatePoll.first_name)
+    else:
+        await query.message.answer("Отправьте свою геолокацию", reply_markup=kb_geo)
+        query.answer()
+        await state.set_state(FSMCandidatePoll.geolocation)
 
 
 @candidate_pc_router.message(F.text, StateFilter(FSMCandidatePoll.first_name))
