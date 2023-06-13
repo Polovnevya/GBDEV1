@@ -67,6 +67,7 @@ class SqlHelper:
                     ]
                 )
 
+    #TODO запилить реализацию
     async def get_candidate_by_id(self, candidate_tg_id: int) -> dict | False:
         """
         ищет по tg_id кандидата, если он не удален
@@ -74,7 +75,7 @@ class SqlHelper:
         :return: возвращает данные кандидата в виде словаря если он имеется в таблице и False если такого кандидата в базе нет
         """
         pass
-
+    #TODO запилить реализацию
     async def insert_or_update_candidate(self, candidate_data: dict) -> None:
         """
         Принимает словарь с данными кандидата
@@ -96,7 +97,7 @@ class SqlHelper:
         :return:
         """
         pass
-
+    #TODO запилить реализацию
     async def get_active_employers_by_id(self) -> list[int]:
         """
         1) не удален
