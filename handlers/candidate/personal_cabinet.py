@@ -3,11 +3,11 @@ from aiogram.enums import ContentType
 from aiogram.filters import Command, StateFilter
 from aiogram.fsm.context import FSMContext
 from aiogram.types import Message, CallbackQuery, ReplyKeyboardRemove
-
 from db.models import GenderEnum, AgeCategoriesEnum, EducationEnum
 from keyboards.candidate import kb_contact, kb_geo
-from keyboards.inline.candidate import get_gender_keyboard_fab, GenderCallback, AgeCallback, get_age_keyboard_fab, \
-    EducationCallback, get_education_keyboard_fab, get_personal_data_keyboard, PersonalData
+from keyboards.inline.candidate import (
+    get_gender_keyboard_fab, GenderCallback, AgeCallback, get_age_keyboard_fab,
+    EducationCallback, get_education_keyboard_fab, get_personal_data_keyboard, PersonalData,)
 from loader import db
 from states.candidate import FSMCandidatePoll
 
@@ -41,7 +41,6 @@ async def process_start_command(message: Message, state: FSMContext, ):
 
 @candidate_pc_router.callback_query(PersonalData.filter(), StateFilter(FSMCandidatePoll.load_pd))
 async def process_candidate_pd(query: CallbackQuery, callback_data: EducationCallback, state: FSMContext):
-
     if callback_data.value == '0':
         await state.clear()
         await query.message.answer(f"Добрый день {query.from_user.full_name}!\n"

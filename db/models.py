@@ -186,7 +186,7 @@ class Post(Base, DateBaseModel):
     __tablename__ = "posts"
 
     id: Mapped[int] = mapped_column(Integer, primary_key=True)
-    massage_id: Mapped[int] = mapped_column(unique=True, nullable=False)
+    message_id: Mapped[int] = mapped_column(unique=True, nullable=False)
     vacancy_id: Mapped[int] = mapped_column(ForeignKey("vacancies.id"), nullable=False)
     channel_id: Mapped[int] = mapped_column(ForeignKey("channels.id"), nullable=False)
 

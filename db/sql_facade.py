@@ -1,16 +1,18 @@
 from typing import Union
-
+from sqlalchemy import inspect, select
 from sqlalchemy.ext.asyncio import create_async_engine, async_sessionmaker, engine
 from .models import Base, Candidate, Employer, Audience, Vacancy, Feedback, Post, Channel
-from .fixtures import fixtures
 from config.config import Config
+import asyncio
 
 
-class SqlManage:
+class SqlManager:
     def __init__(self, config: Config):
         self.async_engine = None
         self.async_session = None
-        self.connection_string = f"postgresql+asyncpg://{config.db.db_user}:{config.db.db_password}@{config.db.db_host}/{config.db.database}"
+        self.async_connection = None
+        self.connection_string = f"postgresql+asyncpg://{config.db.db_user}:{config.db.db_password}" \
+                                 f"@{config.db.db_host}/{config.db.database}"
 
     async def create_async_engine(self) -> engine.AsyncEngine:
         self.async_engine = create_async_engine(
@@ -36,40 +38,62 @@ class SqlManage:
             raise ValueError("engin not created")
         self.async_session = async_sessionmaker(self.async_engine, expire_on_commit=False)
 
+    async def create_async_connection(self) -> None:
+        self.async_connection = self.async_engine.connect()
+
 
 # TODO Антон - переписать скрытую зависимость  self.sm: SqlManage, на DI
+
 class SqlHelper:
-    def __init__(self, config: Config):
-        self.sm: SqlManage = SqlManage(config)
+    def __init__(self, config: Config, sql_manager: SqlManager):
+        self.sql_manager = sql_manager(config)
 
-    # TODO Антон - переписать, разбить метод на отедбные - 1) проверка на наличие и создание таблиц 2) И метод загрузки фикстур
-    async def insert_objects(self, datas: dict) -> None:
-        await self.sm.create_async_engine()
-        await self.sm.drop_all_tables()
-        await self.sm.create_all_tables()
-        await self.sm.create_async_session()
-        async with self.sm.async_session() as session:
+    # TODO Антон - переписать, разбить метод на отедбные
+    #  - 1) проверка на наличие и создание таблиц 2) И метод загрузки фикстур
+
+    async def delete_db_tables(self, is_delete: bool = False) -> None:
+        await self.sql_manager.create_async_engine()
+        if is_delete:
+            await self.sql_manager.drop_all_tables()
+
+    async def create_db_tables(self) -> None:
+        await self.sql_manager.create_async_engine()
+        async with self.sql_manager.async_engine.connect() as conn:
+            db_table_names = await conn.run_sync(
+                lambda sync_conn: inspect(sync_conn).get_table_names()
+            )
+
+        metadata_table_names = [table_name for table_name in Base.metadata.tables.keys()]
+
+        metadata_table_names.sort()
+        db_table_names.sort()
+
+        if not db_table_names == metadata_table_names:
+            await self.sql_manager.create_all_tables()
+
+    async def load_fixtures(self, fixtures: dict) -> None:
+        objects = {}
+        await self.sql_manager.create_async_session()
+        async with self.sql_manager.async_session() as session:
             async with session.begin():
-                candidates = [Candidate(**candidate) for candidate in fixtures.get("candidate")]
-                employers = [Employer(**employer) for employer in fixtures.get("employer")]
-                audiences = [Audience(**audience) for audience in fixtures.get("audience")]
-                vacancies = [Vacancy(**vacancy) for vacancy in fixtures.get("vacancy")]
-                feedbacks = [Feedback(**feedback) for feedback in fixtures.get("feedback")]
-                channels = [Channel(**channel) for channel in fixtures.get("channel")]
-                posts = [Post(**post) for post in fixtures.get("post")]
-                session.add_all(
-                    [
-                        *candidates,
-                        *employers,
-                        *audiences,
-                        *vacancies,
-                        *feedbacks,
-                        *channels,
-                        *posts,
-                    ]
-                )
+                objects[Candidate] = [Candidate(**candidate) for candidate in fixtures.get("candidate")]
+                objects[Employer] = [Employer(**employer) for employer in fixtures.get("employer")]
+                objects[Audience] = [Audience(**audience) for audience in fixtures.get("audience")]
+                objects[Vacancy] = [Vacancy(**vacancy) for vacancy in fixtures.get("vacancy")]
+                objects[Feedback] = [Feedback(**feedback) for feedback in fixtures.get("feedback")]
+                objects[Channel] = [Channel(**channel) for channel in fixtures.get("channel")]
+                objects[Post] = [Post(**post) for post in fixtures.get("post")]
 
-    #TODO запилить реализацию
+                for key, items in objects.items():
+                    for item in items:
+                        kwargs = item.__dict__
+                        del kwargs['_sa_instance_state']
+                        result = await session.execute(select(key).filter_by(**kwargs))
+                        if not result:
+                            session.add(item)
+
+
+    # TODO запилить реализацию
     async def get_candidate_by_id(self, candidate_tg_id: int) -> Union[dict, bool]:
         """
         ищет по tg_id кандидата, если он не удален
@@ -77,15 +101,15 @@ class SqlHelper:
         :return: возвращает данные кандидата в виде словаря если он имеется в таблице и False если такого кандидата в базе нет
         """
         return {'first_name': 'Юрий',
-            'middle_name': 'Андреевич',
-            'last_name': 'Половнев',
-            'gender': 'male',
-            'age': 'senior',      # тут должны быть значения энамов, а не ключи
-            'education': 'higher',
-            'phone': '+79134903369',
-            'tg_id': 618432846}
+                'middle_name': 'Андреевич',
+                'last_name': 'Половнев',
+                'gender': 'male',
+                'age': 'senior',  # тут должны быть значения энамов, а не ключи
+                'education': 'higher',
+                'phone': '+79134903369',
+                'tg_id': 618432846}
 
-    #TODO запилить реализацию
+    # TODO запилить реализацию
     async def insert_or_update_candidate(self, candidate_data: dict) -> None:
         """
         Принимает словарь с данными кандидата
@@ -107,7 +131,8 @@ class SqlHelper:
         :return:
         """
         pass
-    #TODO запилить реализацию
+
+    # TODO запилить реализацию
     async def get_active_employers_by_id(self) -> list[int]:
         """
         1) не удален

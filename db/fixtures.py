@@ -13,7 +13,6 @@ fixtures = {
             "gender": GenderEnum.male,
             "age": AgeCategoriesEnum.junior,
             "education": EducationEnum.secondary,
-            "email": "ivanov@email.ru",
             "phone": "9111111111"
         },
         {
@@ -26,7 +25,6 @@ fixtures = {
             "gender": GenderEnum.male,
             "age": AgeCategoriesEnum.senior,
             "education": EducationEnum.higher,
-            "email": "petrov@email.ru",
             "phone": "9222222222"
         }
     ],
@@ -93,9 +91,11 @@ fixtures = {
     "channel": [
         {
             "name": "IT вакансии",
+            "channel_id": 1,
         },
         {
             "name": "неквалифицированные вакансии",
+            "channel_id": 2,
         },
     ],
     "channel_by_audiences": [
@@ -112,10 +112,12 @@ fixtures = {
         {
             "vacancy_id": 1,
             "channel_id": 1,
+            "message_id": 1,
         },
         {
             "vacancy_id": 2,
             "channel_id": 2,
+            "message_id": 2,
         },
     ]
 }
