@@ -72,9 +72,7 @@ class Candidate(Base, DateBaseModel):
 
     id: Mapped[int] = mapped_column(primary_key=True)
     feedback: Mapped[List["Feedback"]] = relationship()
-    user_name: Mapped[str] = mapped_column(String, unique=True, nullable=False)
-    user_id: Mapped[int] = mapped_column(unique=True, nullable=False)
-    chat_id: Mapped[int] = mapped_column(unique=True, nullable=False)
+    tg_id: Mapped[int] = mapped_column(unique=True, nullable=False)
     first_name: Mapped[str] = mapped_column(String(50), nullable=False)
     middle_name: Mapped[str] = mapped_column(String(50), nullable=True)
     last_name: Mapped[str] = mapped_column(String(50), nullable=False)
@@ -82,14 +80,14 @@ class Candidate(Base, DateBaseModel):
     age: Mapped[Enum] = mapped_column(Enum(AgeCategoriesEnum), nullable=False)
     education: Mapped[Enum] = mapped_column(Enum(EducationEnum), nullable=False)
     phone: Mapped[PhoneNumberType] = mapped_column(
-        PhoneNumberType(region="RU", check_region=True, max_length=12),
+        PhoneNumberType(region="RU", check_region=True, max_length=13),
         nullable=False,
         unique=True,
     )
 
     def __repr__(self):
-        return f"<id: {self.id}, user_name: {self.user_name}, user_id: {self.user_id}, " \
-               f"chat_id: {self.chat_id}, first_name: {self.first_name}, middle_name: {self.last_name}, " \
+        return f"<id: {self.id}, tg_id: {self.tg_id}, " \
+               f"first_name: {self.first_name}, middle_name: {self.last_name}, " \
                f"last_name: {self.last_name}, gender: {self.gender}, age: {self.age}, education: {self.education}, " \
                f"phone: {self.phone}, " \
                f"created_at: {self.created_at}, updated_at: {self.updated_at}, deleted_at: {self.updated_at}>"

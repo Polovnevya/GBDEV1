@@ -4,9 +4,7 @@ from datetime import datetime, timedelta
 fixtures = {
     "candidate": [
         {
-            "user_name": "@Ivan_Ivanov",
-            "user_id": 1,
-            "chat_id": 1,
+            "tg_id": 1,
             "first_name": "Иван",
             "middle_name": "Иванович",
             "last_name": "Иванов",
@@ -16,9 +14,7 @@ fixtures = {
             "phone": "9111111111"
         },
         {
-            "user_name": "@Petr_Petrov",
-            "user_id": 2,
-            "chat_id": 2,
+            "tg_id": 2,
             "first_name": "Петр",
             "middle_name": "Петрович",
             "last_name": "Петров",
