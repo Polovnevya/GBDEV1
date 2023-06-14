@@ -67,8 +67,7 @@ class ContactBaseModel:
         return address
 
 
-class Candidate(Base, ContactBaseModel, DateBaseModel):
-    #TODO Убрать почту у кандидата, оставить только номер телефона. никто почту писать не будет
+class Candidate(Base, DateBaseModel):
     __tablename__ = "candidates"
 
     id: Mapped[int] = mapped_column(primary_key=True)
@@ -77,17 +76,22 @@ class Candidate(Base, ContactBaseModel, DateBaseModel):
     user_id: Mapped[int] = mapped_column(unique=True, nullable=False)
     chat_id: Mapped[int] = mapped_column(unique=True, nullable=False)
     first_name: Mapped[str] = mapped_column(String(50), nullable=False)
-    middle_name: Mapped[str] = mapped_column(String(50), nullable=False)
+    middle_name: Mapped[str] = mapped_column(String(50), nullable=True)
     last_name: Mapped[str] = mapped_column(String(50), nullable=False)
     gender: Mapped[Enum] = mapped_column(Enum(GenderEnum), nullable=False)
     age: Mapped[Enum] = mapped_column(Enum(AgeCategoriesEnum), nullable=False)
     education: Mapped[Enum] = mapped_column(Enum(EducationEnum), nullable=False)
+    phone: Mapped[PhoneNumberType] = mapped_column(
+        PhoneNumberType(region="RU", check_region=True, max_length=12),
+        nullable=False,
+        unique=True,
+    )
 
     def __repr__(self):
         return f"<id: {self.id}, user_name: {self.user_name}, user_id: {self.user_id}, " \
                f"chat_id: {self.chat_id}, first_name: {self.first_name}, middle_name: {self.last_name}, " \
                f"last_name: {self.last_name}, gender: {self.gender}, age: {self.age}, education: {self.education}, " \
-               f"phone: {self.phone}, email: {self.email}, " \
+               f"phone: {self.phone}, " \
                f"created_at: {self.created_at}, updated_at: {self.updated_at}, deleted_at: {self.updated_at}>"
 
 
@@ -169,12 +173,12 @@ class Channel(Base, DateBaseModel):
     __tablename__ = "channels"
 
     id: Mapped[int] = mapped_column(Integer, primary_key=True)
-    #TODO Антон - добавить chanel_id
     name: Mapped[str] = mapped_column(String, nullable=False)
+    channel_id: Mapped[int] = mapped_column(unique=True, nullable=False)
     audience: Mapped[List[Audience]] = relationship(secondary=channel_to_audience)
 
     def __repr__(self):
-        return f"<id: {self.id}, name: {self.name}, audience: {self.audience.key}, " \
+        return f"<id: {self.id}, name: {self.name}, channel_id: {self.channel_id}, audience: {self.audience.key}, " \
                f"created_at: {self.created_at}, updated_at: {self.updated_at}, deleted_at: {self.updated_at}>"
 
 
@@ -182,10 +186,11 @@ class Post(Base, DateBaseModel):
     __tablename__ = "posts"
 
     id: Mapped[int] = mapped_column(Integer, primary_key=True)
-    #TODO Антон - добавить message_id
+    message_id: Mapped[int] = mapped_column(unique=True, nullable=False)
     vacancy_id: Mapped[int] = mapped_column(ForeignKey("vacancies.id"), nullable=False)
     channel_id: Mapped[int] = mapped_column(ForeignKey("channels.id"), nullable=False)
 
     def __repr__(self):
-        return f"<id: {self.id}, vacancy_id: {self.vacancy_id.key}, channel_id {self.channel_id}, " \
+        return f"<id: {self.id}, vacancy_id: {self.vacancy_id.key}, message_id: {self.massage_id} " \
+               f"channel_id {self.channel_id}, " \
                f"created_at: {self.created_at}, updated_at: {self.updated_at}, deleted_at: {self.updated_at}>"
