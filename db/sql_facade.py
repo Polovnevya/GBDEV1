@@ -3,6 +3,7 @@ from sqlalchemy import inspect, select
 from sqlalchemy.ext.asyncio import create_async_engine, async_sessionmaker, engine
 from .models import Base, Candidate, Employer, Audience, Vacancy, Feedback, Post, Channel
 from config.config import Config
+from .data_class_for_models import CandidateData
 import asyncio
 
 
@@ -42,14 +43,9 @@ class SqlManager:
         self.async_connection = self.async_engine.connect()
 
 
-# TODO Антон - переписать скрытую зависимость  self.sm: SqlManage, на DI
-
 class SqlHelper:
-    def __init__(self, config: Config, sql_manager: SqlManager):
-        self.sql_manager = sql_manager(config)
-
-    # TODO Антон - переписать, разбить метод на отедбные
-    #  - 1) проверка на наличие и создание таблиц 2) И метод загрузки фикстур
+    def __init__(self, sql_manager: SqlManager):
+        self.sql_manager = sql_manager
 
     async def delete_db_tables(self, is_delete: bool = False) -> None:
         await self.sql_manager.create_async_engine()
@@ -92,7 +88,6 @@ class SqlHelper:
                         if not result:
                             session.add(item)
 
-
     # TODO запилить реализацию
     async def get_candidate_by_id(self, candidate_tg_id: int) -> Union[dict, bool]:
         """
@@ -110,17 +105,9 @@ class SqlHelper:
                 'tg_id': 618432846}
 
     # TODO запилить реализацию
-    async def insert_or_update_candidate(self, candidate_data: dict) -> None:
+    async def insert_or_update_candidate(self, candidate_data: CandidateData) -> None:
         """
-        Принимает словарь с данными кандидата
-            {'first_name': 'ф',
-            'middle_name': 'ы',
-            'last_name': 'в',
-            'gender': 'female',
-            'age': 'senior',
-            'education': 'higher',
-            'phone': '+79134903369',
-            'tg_id': 618432846}
+        Принимает dataclass с данными кандидата
 
         производит добавление кандидата если его нет
         и
@@ -130,7 +117,21 @@ class SqlHelper:
         :param candidate_data:
         :return:
         """
-        pass
+
+        await self.sql_manager.create_async_session()
+        async with self.sql_manager.async_session() as session:
+            async with session.begin():
+                result = await session.execute(select(Candidate).filter_by(tg_id=candidate_data.tg_id))
+                candidate = result.one_or_none()
+                if not candidate:
+                    session.add(Candidate(**candidate_data.__dict__))
+                else:
+                    candidate.first_name = candidate_data.first_name
+                    candidate.middle_name = candidate_data.middle_name
+                    candidate.education = candidate_data.education
+                    candidate.age = candidate_data.age
+                    candidate.phone = candidate_data.phone
+                    candidate.gender = candidate_data.gender
 
     # TODO запилить реализацию
     async def get_active_employers_by_id(self) -> list[int]:
