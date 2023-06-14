@@ -5,45 +5,15 @@ from sqlalchemy import Integer, String, DateTime, ForeignKey
 from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column, validates
 from sqlalchemy.orm import relationship
 from datetime import datetime
-import enum
+
 from sqlalchemy_utils import EmailType, PhoneNumberType
 from validate_email import validate_email
+
+from db.types import GenderEnum, AgeCategoriesEnum, EducationEnum, WorkScheduleEnum, EmploymentEnum
 
 
 class Base(DeclarativeBase):
     pass
-
-
-class EmploymentEnum(enum.Enum):
-    full_time = "полная занятость"
-    part_time = "частичная занятость"
-    internship = "стажировка"
-    single = "проектная работа/разовое задание"
-    volunteering = "волонтёрство"
-
-
-class WorkScheduleEnum(enum.Enum):
-    full_day = "полный день"
-    shift = "сменный"
-    flexible = "гибкий"
-    remote = "удаленная работа"
-
-
-class GenderEnum(enum.Enum):
-    male = "жен."
-    female = "муж."
-
-
-class EducationEnum(enum.Enum):
-    secondary = "среднее образование"
-    vocational = "средннее профессиональное образование"
-    higher = "высшее образование"
-
-
-class AgeCategoriesEnum(enum.Enum):
-    junior = "от 18 до 25"
-    middle = "от 25 до 40"
-    senior = "от 40 до 60"
 
 
 class DateBaseModel:
@@ -117,7 +87,7 @@ class Employer(Base, ContactBaseModel, DateBaseModel):
 
     def __repr__(self):
         return f"<id: {self.id}, user_name: {self.user_name}, user_id: {self.user_id}, " \
-               f"chat_id: {self.chat_id}, company_name: {self.first_name}, " \
+               f"chat_id: {self.chat_id}, company_name: {self.company_name}, " \
                f"phone: {self.phone}, email: {self.email}, " \
                f"created_at: {self.created_at}, updated_at: {self.updated_at}, deleted_at: {self.updated_at}>"
 
@@ -184,11 +154,11 @@ class Post(Base, DateBaseModel):
     __tablename__ = "posts"
 
     id: Mapped[int] = mapped_column(Integer, primary_key=True)
-    message_id: Mapped[int] = mapped_column(unique=True, nullable=False)
+    message_id: Mapped[int] = mapped_column(unique=False, nullable=False)
     vacancy_id: Mapped[int] = mapped_column(ForeignKey("vacancies.id"), nullable=False)
     channel_id: Mapped[int] = mapped_column(ForeignKey("channels.id"), nullable=False)
 
     def __repr__(self):
-        return f"<id: {self.id}, vacancy_id: {self.vacancy_id.key}, message_id: {self.massage_id} " \
+        return f"<id: {self.id}, vacancy_id: {self.vacancy_id.key}, message_id: {self.message_id} " \
                f"channel_id {self.channel_id}, " \
                f"created_at: {self.created_at}, updated_at: {self.updated_at}, deleted_at: {self.updated_at}>"

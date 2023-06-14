@@ -3,8 +3,7 @@ from sqlalchemy import inspect, select
 from sqlalchemy.ext.asyncio import create_async_engine, async_sessionmaker, engine
 from .models import Base, Candidate, Employer, Audience, Vacancy, Feedback, Post, Channel
 from config.config import Config
-from .data_class_for_models import CandidateData
-import asyncio
+from .types import CandidateData
 
 
 class SqlManager:
@@ -93,7 +92,8 @@ class SqlHelper:
         """
         ищет по tg_id кандидата, если он не удален
         :param candidate_tg_id:
-        :return: возвращает данные кандидата в виде словаря если он имеется в таблице и False если такого кандидата в базе нет
+        :return: возвращает данные кандидата в виде словаря если он имеется в таблице
+                и False если такого кандидата в базе нет
         """
         return {'first_name': 'Юрий',
                 'middle_name': 'Андреевич',
@@ -134,7 +134,7 @@ class SqlHelper:
                     candidate.gender = candidate_data.gender
 
     # TODO запилить реализацию
-    async def get_active_employers_by_id(self) -> list[int]:
+    async def get_active_employers_by_id(self, employer_tg_id: int) -> list[int]:
         """
         1) не удален
         :param employer_tg_id:

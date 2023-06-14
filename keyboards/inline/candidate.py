@@ -2,7 +2,7 @@ from typing import Optional, Type
 from aiogram.filters.callback_data import CallbackData
 from aiogram.utils.keyboard import InlineKeyboardBuilder
 
-from db.models import GenderEnum, EducationEnum, AgeCategoriesEnum
+from db.types import GenderEnum, EducationEnum, AgeCategoriesEnum
 
 
 class PersonalData(CallbackData, prefix="PD"):

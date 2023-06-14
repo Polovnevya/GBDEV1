@@ -7,7 +7,7 @@ from db.models import GenderEnum, AgeCategoriesEnum, EducationEnum
 from keyboards.candidate import kb_contact, kb_geo
 from keyboards.inline.candidate import (
     get_gender_keyboard_fab, GenderCallback, AgeCallback, get_age_keyboard_fab,
-    EducationCallback, get_education_keyboard_fab, get_personal_data_keyboard, PersonalData,)
+    EducationCallback, get_education_keyboard_fab, get_personal_data_keyboard, PersonalData, )
 from loader import db
 from states.candidate import FSMCandidatePoll
 
@@ -43,14 +43,14 @@ async def process_start_command(message: Message, state: FSMContext, ):
 async def process_candidate_pd(query: CallbackQuery, callback_data: EducationCallback, state: FSMContext):
     if callback_data.value == '0':
         await state.clear()
+        await query.answer()
         await query.message.answer(f"Добрый день {query.from_user.full_name}!\n"
                                    f"Для создания отклика пройдите небольшой анкетирование")
         await query.message.answer(f"Введите Ваше имя", reply_markup=ReplyKeyboardRemove())
-        query.answer()
         await state.set_state(FSMCandidatePoll.first_name)
     else:
         await query.message.answer("Отправьте свою геолокацию", reply_markup=kb_geo)
-        query.answer()
+
         await state.set_state(FSMCandidatePoll.geolocation)
 
 
@@ -104,7 +104,7 @@ async def process_get_phone(message: Message, state: FSMContext):
     await state.update_data({"phone": message.contact.phone_number})
     await state.update_data({"tg_id": message.from_user.id})
     # TODO Произвести запись в базу даных
-    tmp = await  state.get_data()
+    tmp = await state.get_data()
     await message.answer(f"Тут производим запись кандидата в бд,\n"
                          f"{tmp}")
     await message.answer("Спасибо что прошли опрос!\n"
