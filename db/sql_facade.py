@@ -1,4 +1,4 @@
-from typing import Union
+from typing import Union, List, Tuple
 from sqlalchemy import inspect, select
 from sqlalchemy.ext.asyncio import create_async_engine, async_sessionmaker, engine
 from .models import Base, Candidate, Employer, Audience, Vacancy, Feedback, Post, Channel
@@ -108,14 +108,11 @@ class SqlHelper:
     async def insert_or_update_candidate(self, candidate_data: CandidateData) -> None:
         """
         Принимает dataclass с данными кандидата
-
         производит добавление кандидата если его нет
         и
         обновляет данные кандидата если он уже есть в базе
         можно разбить на 2 метода добавление и обновление, а этот использовать как фасад
 
-        :param candidate_data:
-        :return:
         """
 
         await self.sql_manager.create_async_session()
@@ -142,6 +139,27 @@ class SqlHelper:
         """
         pass
 
-# async def main() -> None:
-#     sh = SqlHelper()
-#     await sh.insert_objects(fixtures)
+    # TODO запилить реализацию
+    async def get_vacancy_by_id(self, vacancy_id: int) -> Vacancy:
+        """
+        Возвращает 1 вкансию по ее id
+        :param vacancy_id:
+        :return:
+        """
+        pass
+
+    # TODO запилить реализацию
+    async def get_vacancy_by_geolocation(self, longitude: float, latitude: float) -> List[Vacancy]:
+        """
+        возвращает список вакансий, по широте и долготе
+        в определенном радиусе (можно в конфиг пробросить и вытаскивать потом из него)
+        произвести сортировку вакансий по возрастанию расстояния от соискателя - первым делом показываем самые ближние
+
+        запилить датакласс под широту и долготу?
+
+        :param longitude:
+        :param latitude:
+        :return:
+        """
+        pass
+
