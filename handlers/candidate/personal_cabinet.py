@@ -49,7 +49,9 @@ async def process_candidate_pd(query: CallbackQuery, callback_data: EducationCal
         await query.message.answer(f"Введите Ваше имя", reply_markup=ReplyKeyboardRemove())
         await state.set_state(FSMCandidatePoll.first_name)
     else:
-        await query.message.answer("Отправьте свою геолокацию", reply_markup=kb_geo)
+        await query.message.answer("Для дальнейшего поиска открытых вакансий - "
+                                   "отправьте свою геолокацию и бот подберет для вас самые ближайшие варианты",
+                                   reply_markup=kb_geo)
 
         await state.set_state(FSMCandidatePoll.geolocation)
 
@@ -107,6 +109,7 @@ async def process_get_phone(message: Message, state: FSMContext):
     tmp = await state.get_data()
     await message.answer(f"Тут производим запись кандидата в бд,\n"
                          f"{tmp}")
+    await db.insert_or_update_candidate()
     await message.answer("Спасибо что прошли опрос!\n"
                          "Для дальнейшего поиска открытых вакансий - "
                          "отправьте свою геолокацию и бот подберет для вас самые ближайшие варианты",
@@ -116,8 +119,10 @@ async def process_get_phone(message: Message, state: FSMContext):
 
 @candidate_pc_router.message(StateFilter(FSMCandidatePoll.geolocation), F.content_type.in_({ContentType.LOCATION}))
 async def process_get_phone(message: Message, state: FSMContext):
-    await state.update_data({"phone": message.contact.phone_number})
-    await message.answer("Отправьте свою геолокацию", reply_markup=kb_geo)
+    a = message
+    longitude = message.location.longitude
+    latitude = message.location.latitude
+    result = await db.get_vacancy_by_geolocation(longitude,latitude)
     await state.set_state(FSMCandidatePoll.geolocation)
 
 
