@@ -3,7 +3,7 @@ import typing
 from aiogram.types import InlineKeyboardMarkup, InlineKeyboardButton
 from aiogram.filters.callback_data import CallbackData
 
-from aiogram.utils.keyboard import InlineKeyboardBuilder, KeyboardBuilder
+from aiogram.utils.keyboard import InlineKeyboardBuilder
 
 
 class Navigation(CallbackData, prefix="PG"):
@@ -49,7 +49,6 @@ class Paginator:
                 builder.button(text="Еще ▶", callback_data=Navigation(direction="next"))
                 builder.adjust(1)
                 return builder.as_markup()
-
 
             elif to_ >= len(self.__buttons):
                 builder.button(text="◀ Назад", callback_data=Navigation(direction="previous"))

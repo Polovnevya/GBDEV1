@@ -1,4 +1,4 @@
-from typing import Union, List, Tuple
+from typing import Union, List
 from sqlalchemy import inspect, select
 from sqlalchemy.ext.asyncio import create_async_engine, async_sessionmaker, engine
 from .models import Base, Candidate, Employer, Audience, Vacancy, Feedback, Post, Channel
@@ -105,7 +105,7 @@ class SqlHelper:
                 'tg_id': 618432846}
 
     # TODO запилить реализацию
-    async def insert_or_update_candidate(self, candidate_data: CandidateData) -> None:
+    async def insert_or_update_candidate(self, candidate_data: DAOCandidateData) -> None:
         """
         Принимает dataclass с данными кандидата
         производит добавление кандидата если его нет
@@ -149,7 +149,7 @@ class SqlHelper:
         pass
 
     # TODO запилить реализацию
-    async def get_vacancy_by_geolocation(self, longitude: float, latitude: float) -> List[Vacancy]:
+    async def get_vacancy_by_geolocation(self, longitude: float, latitude: float) -> List[DAOVacancy]:
         """
         возвращает список вакансий, по широте и долготе
         в определенном радиусе (можно в конфиг пробросить и вытаскивать потом из него)
@@ -214,3 +214,7 @@ class SqlHelper:
             },
         ]
         return vacancy_data
+
+    # TODO записать отклик в базу данных
+    async def insert_or_update_vacancy_response(self, vacancy_response: DAOFeedback) -> None:
+        pass

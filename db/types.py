@@ -4,7 +4,22 @@ from dataclasses import dataclass
 
 # dataclasses
 @dataclass
-class CandidateData:
+class DAOFeedback:
+    candidate_id: int
+    id_vacancy: int
+
+
+@dataclass
+class DAOVacancy:
+    id: int
+    name: str
+    work_schedule: str
+    employment: str
+    salary: float
+
+
+@dataclass
+class DAOCandidateData:
     first_name: str
     middle_name: str
     last_name: str
