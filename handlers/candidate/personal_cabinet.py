@@ -1,3 +1,6 @@
+import pickle
+from typing import Dict
+
 from aiogram import Router, F
 from aiogram.enums import ContentType
 from aiogram.filters import Command, StateFilter
@@ -8,6 +11,7 @@ from keyboards.candidate import kb_contact, kb_geo
 from keyboards.inline.candidate import (
     get_gender_keyboard_fab, GenderCallback, AgeCallback, get_age_keyboard_fab,
     EducationCallback, get_education_keyboard_fab, get_personal_data_keyboard, PersonalData, )
+from keyboards.inline.vacancy_paginator import get_vacancy_parinator_keyboard_fab, Paginator, Navigation
 from loader import db
 from states.candidate import FSMCandidatePoll
 
@@ -21,7 +25,6 @@ async def process_start_command(message: Message, state: FSMContext, ):
                          f"Для создания отклика пройдите небольшой анкетирование",
                          reply_markup=ReplyKeyboardRemove())
 
-    # TODO если кандидат уже есть в базе - пропускаем анкетирование,
     result = await db.get_candidate_by_id(message.from_user.id)
     if not result:
         await message.answer(f"Введите Ваше имя")
@@ -118,15 +121,60 @@ async def process_get_phone(message: Message, state: FSMContext):
 
 
 @candidate_pc_router.message(StateFilter(FSMCandidatePoll.geolocation), F.content_type.in_({ContentType.LOCATION}))
-async def process_get_phone(message: Message, state: FSMContext):
-    a = message
+async def process_show_vacancy(message: Message, state: FSMContext):
     longitude = message.location.longitude
     latitude = message.location.latitude
-    result = await db.get_vacancy_by_geolocation(longitude,latitude)
-    await state.set_state(FSMCandidatePoll.geolocation)
+    result = await db.get_vacancy_by_geolocation(longitude, latitude)
+    await state.set_state(FSMCandidatePoll.show_vacancy)
+    await state.update_data({"vacancy": result})
+    await state.update_data({"paginator": result})
+
+    vacancy_paginator: Paginator = get_vacancy_parinator_keyboard_fab(result)
+    await state.update_data({"paginator": vacancy_paginator})
+    current_vacancy_data: Dict = result[0]
+    await message.answer(f"Текст вакансии: {current_vacancy_data.get('name')}\n"
+                         f"Оплата: {current_vacancy_data.get('salary')}\n"
+                         f"График: {current_vacancy_data.get('work_schedule')}\n",
+                         reply_markup=await vacancy_paginator.update_kb())
+
+
+#
+@candidate_pc_router.callback_query(StateFilter(FSMCandidatePoll.show_vacancy),
+                                    Navigation.filter(F.direction == "next"))
+async def process_forward_show_vacancy(query: CallbackQuery, state: FSMContext):
+    result = await state.get_data()
+    vacancy_paginator: Paginator = result.get("paginator")
+    await vacancy_paginator.on_next()
+    await state.update_data({"paginator": vacancy_paginator})
+    current_vacancy_data: Dict = result.get("vacancy")[vacancy_paginator.page]
+    await query.message.edit_text(f"Текст вакансии: {current_vacancy_data.get('name')}\n"
+                                          f"Оплата: {current_vacancy_data.get('salary')}\n"
+                                          f"График: {current_vacancy_data.get('work_schedule')}\n",
+                                          reply_markup=await vacancy_paginator.update_kb())
+
+
+@candidate_pc_router.callback_query(StateFilter(FSMCandidatePoll.show_vacancy),
+                                    Navigation.filter(F.direction == "previous"))
+async def process_backward_show_vacancy(query: CallbackQuery, state: FSMContext):
+    result = await state.get_data()
+    vacancy_paginator: Paginator = result.get("paginator")
+    await vacancy_paginator.on_prev()
+    await state.update_data({"paginator": vacancy_paginator})
+    current_vacancy_data: Dict = result.get("vacancy")[vacancy_paginator.page]
+    await query.message.edit_text(f"Текст вакансии: {current_vacancy_data.get('name')}\n"
+                                          f"Оплата: {current_vacancy_data.get('salary')}\n"
+                                          f"График: {current_vacancy_data.get('work_schedule')}\n",
+                                          reply_markup=await vacancy_paginator.update_kb())
+
+
+@candidate_pc_router.message(StateFilter(FSMCandidatePoll.geolocation))
+async def process_show_vacancy_without_geo(message: Message):
+    await message.answer(f"Отправьте свою геолокацию\n"
+                         f"данная функция работает только на мобильном телефоне")
 
 
 @candidate_pc_router.message()
 @candidate_pc_router.callback_query()
-async def process_start_command(message: Message):
-    await message.answer("Вы что то делаете не так, перезапустите бот и попробуйте еще раз")
+async def process_start_command(query: CallbackQuery):
+    a = 1
+    await query.message.answer("Вы что то делаете не так, перезапустите бот и попробуйте еще раз")

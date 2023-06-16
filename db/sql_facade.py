@@ -3,7 +3,7 @@ from sqlalchemy import inspect, select
 from sqlalchemy.ext.asyncio import create_async_engine, async_sessionmaker, engine
 from .models import Base, Candidate, Employer, Audience, Vacancy, Feedback, Post, Channel
 from config.config import Config
-from .types import CandidateData
+from .types import *
 
 
 class SqlManager:
@@ -155,11 +155,62 @@ class SqlHelper:
         в определенном радиусе (можно в конфиг пробросить и вытаскивать потом из него)
         произвести сортировку вакансий по возрастанию расстояния от соискателя - первым делом показываем самые ближние
 
-        запилить датакласс под широту и долготу?
+        запилить датакласс под широту и долготу? и под вакансии тож надо бы
 
         :param longitude:
         :param latitude:
         :return:
         """
-        pass
-
+        # заглушка
+        vacancy_data = [
+            {
+                "id": "1",
+                "name": "сетевой инженер",
+                "work_schedule": WorkScheduleEnum.remote.value,
+                "employment": EmploymentEnum.full_time.value,
+                "salary": 150_000.50,
+            },
+            {
+                "id": "2",
+                "name": "грузчик",
+                "work_schedule": WorkScheduleEnum.flexible.value,
+                "employment": EmploymentEnum.internship.value,
+                "salary": 15_000.75,
+            },
+            {
+                "id": "3",
+                "name": "админ",
+                "work_schedule": WorkScheduleEnum.flexible.value,
+                "employment": EmploymentEnum.internship.value,
+                "salary": 15_000.75,
+            },
+            {
+                "id": "4",
+                "name": "разраб",
+                "work_schedule": WorkScheduleEnum.flexible.value,
+                "employment": EmploymentEnum.internship.value,
+                "salary": 15_000.75,
+            },
+            {
+                "id": "5",
+                "name": "страдатель фигней",
+                "work_schedule": WorkScheduleEnum.flexible.value,
+                "employment": EmploymentEnum.internship.value,
+                "salary": 15_000.75,
+            },
+            {
+                "id": "6",
+                "name": "отпускник",
+                "work_schedule": WorkScheduleEnum.flexible.value,
+                "employment": EmploymentEnum.internship.value,
+                "salary": 15_000.75,
+            },
+            {
+                "id": "7",
+                "name": "еще грузчик",
+                "work_schedule": WorkScheduleEnum.flexible.value,
+                "employment": EmploymentEnum.internship.value,
+                "salary": 15_000.75,
+            },
+        ]
+        return vacancy_data
