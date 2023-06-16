@@ -1,6 +1,7 @@
 import enum
 from dataclasses import dataclass
 
+
 # dataclasses
 @dataclass
 class CandidateData:
@@ -12,6 +13,7 @@ class CandidateData:
     education: str
     phone: str
     tg_id: str
+
 
 # enums
 
@@ -45,4 +47,3 @@ class AgeCategoriesEnum(enum.Enum):
     junior = "от 18 до 25"
     middle = "от 25 до 40"
     senior = "от 40 до 60"
-
