@@ -11,6 +11,5 @@ class FSMCandidatePoll(StatesGroup):
     email = State()
     phone = State()
     geolocation = State()
+    show_vacancy = State()
     load_pd = State()
-
-
