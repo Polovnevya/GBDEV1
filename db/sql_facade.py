@@ -131,13 +131,16 @@ class SqlHelper:
                     candidate.gender = candidate_data.gender
 
     # TODO запилить реализацию
-    async def get_active_employers_by_id(self, employer_tg_id: int) -> list[int]:
+    async def get_active_employers_by_id(self, employer_tg_id: int) -> Union[dict, bool]:
         """
         1) не удален
         :param employer_tg_id:
         :return:
         """
-        pass
+        # pass
+        return {'company_name': 'Марктика',
+                'email': '@mail',
+                'phone': '+79132511727'}
 
     # TODO запилить реализацию
     async def get_vacancy_by_id(self, vacancy_id: int) -> Vacancy:

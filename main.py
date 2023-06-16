@@ -27,7 +27,8 @@ async def main():
     await set_main_menu(bot)
 
     # Регистриуем роутеры в диспетчере
-    dp.include_router(handlers.candidate.personal_cabinet.candidate_pc_router)
+    #dp.include_router(handlers.candidate.personal_cabinet.candidate_pc_router)
+    dp.include_router(handlers.employer.personal_cabinet.employer_pc_router)
     dp.include_router(handlers.common.echo.router)
 
     # Пропускаем накопившиеся апдейты и запускаем polling
