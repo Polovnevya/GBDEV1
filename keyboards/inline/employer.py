@@ -1,4 +1,3 @@
-<<<<<<< Updated upstream
 from typing import Optional, Type
 from aiogram.filters.callback_data import CallbackData
 from aiogram.utils.keyboard import InlineKeyboardBuilder
@@ -21,16 +20,3 @@ def get_personal_data_keyboard():
     )
     builder.adjust(2)
     return builder.as_markup()
-=======
-from typing import Optional
-# , Type
-from aiogram.filters.callback_data import CallbackData
-# from aiogram.utils.keyboard import InlineKeyboardBuilder
-
-# from db.models import GenderEnum, EducationEnum, AgeCategoriesEnum
-
-
-class CompanyData(CallbackData, prefix="CD"):
-    action: str
-    value: Optional[str]
->>>>>>> Stashed changes
