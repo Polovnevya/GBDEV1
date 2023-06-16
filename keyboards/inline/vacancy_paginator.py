@@ -56,9 +56,10 @@ class Paginator:
                 builder.adjust(1)
                 return builder.as_markup()
 
-            builder.button(text="Еще ▶", callback_data=Navigation(direction="next"))
-            builder.button(text="◀ Назад", callback_data=Navigation(direction="previous"))
-            builder.adjust(1)
+            buttons: typing.List[InlineKeyboardButton] = [
+                InlineKeyboardButton(text="◀ Назад", callback_data="PG:previous"),
+                InlineKeyboardButton(text="Еще ▶", callback_data="PG:next"), ]
+            builder.row(*buttons)
             return builder.as_markup()
 
         else:

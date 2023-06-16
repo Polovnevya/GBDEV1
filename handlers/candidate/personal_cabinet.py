@@ -1,4 +1,3 @@
-import pickle
 from typing import Dict
 
 from aiogram import Router, F
@@ -112,6 +111,7 @@ async def process_get_phone(message: Message, state: FSMContext):
     tmp = await state.get_data()
     await message.answer(f"Тут производим запись кандидата в бд,\n"
                          f"{tmp}")
+
     await db.insert_or_update_candidate()
     await message.answer("Спасибо что прошли опрос!\n"
                          "Для дальнейшего поиска открытых вакансий - "
