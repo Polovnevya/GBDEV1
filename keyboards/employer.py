@@ -1,4 +1,5 @@
-from aiogram.types import ReplyKeyboardMarkup, KeyboardButton, KeyboardButtonPollType
+from aiogram.types import (ReplyKeyboardMarkup, KeyboardButton, KeyboardButtonPollType,
+                           InlineKeyboardButton, InlineKeyboardMarkup)
 from aiogram.utils.keyboard import ReplyKeyboardBuilder
 
 # Создаем кнопки
@@ -25,3 +26,14 @@ kb_contact: ReplyKeyboardMarkup = kb_contact_builder.as_markup(
 kb_geo: ReplyKeyboardMarkup = kb_geo_builder.as_markup(
     resize_keyboard=True,
     one_time_keyboard=True)
+
+
+
+# Создаем объекты инлайн-кнопок
+url_button_1: InlineKeyboardButton = InlineKeyboardButton(
+    text='Скачать файл',
+    url='https://disk.yandex.ru/d/0_2sJJ3xGDKlfA')
+
+# Создаем объект инлайн-клавиатуры
+keyboard: InlineKeyboardMarkup = InlineKeyboardMarkup(
+    inline_keyboard=[[url_button_1]])
