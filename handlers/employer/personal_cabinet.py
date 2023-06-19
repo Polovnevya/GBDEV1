@@ -1,6 +1,6 @@
 from aiogram import Router, F
 from aiogram.enums import ContentType
-from aiogram.filters import Command, StateFilter
+from aiogram.filters import Command, StateFilter, CommandStart
 from aiogram.fsm.context import FSMContext
 from aiogram.types import Message, CallbackQuery, ReplyKeyboardRemove
 # from db.models import GenderEnum, AgeCategoriesEnum, EducationEnum
@@ -9,6 +9,8 @@ from keyboards.inline.employer import get_personal_data_keyboard, PersonalData
 from keyboards.inline.candidate import EducationCallback
 from loader import db
 from states.employer import FSMEmployerPoll
+from keyboards.employer import keyboard
+
 
 employer_pc_router: Router = Router()
 
@@ -90,6 +92,14 @@ async def process_get_phone(message: Message, state: FSMContext):
     await state.set_state(FSMEmployerPoll.geolocation)
     tmp = await state.get_data()
     await message.answer(f"{tmp}")
+
+
+# Этот хэндлер будет срабатывать на команду "/download_form"
+# и отправлять в чат клавиатуру c url-кнопками
+@employer_pc_router.message(CommandStart())
+async def process_start_command(message: Message):
+    await message.answer(text='Форма для заполнения',
+                         reply_markup=keyboard)
 
 
 @employer_pc_router.message()
