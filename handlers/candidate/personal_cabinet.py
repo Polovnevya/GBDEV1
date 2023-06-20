@@ -19,7 +19,7 @@ from states.candidate import FSMCandidatePoll
 candidate_pc_router: Router = Router()
 
 
-@candidate_pc_router.message(Command(commands=['bot']))  # , StateFilter(default_state))
+@candidate_pc_router.message(Command(commands=['start']))  # , StateFilter(default_state))
 async def process_start_command(message: Message, state: FSMContext, ):
     await state.clear()
     await message.answer(f"Добрый день {message.from_user.full_name}!\n"
@@ -196,4 +196,7 @@ async def process_start_command(query: CallbackQuery):
     a = 1
     # candidate = await db.get_candidate_by_id(618432846)
     # print(candidate)
-    await query.message.answer("Вы что то делаете не так, перезапустите бот и попробуйте еще раз")
+    try:
+        await query.message.answer("Вы что то делаете не так, перезапустите бот и попробуйте еще раз")
+    except:
+        await query.message.answer("Вы что то делаете не так, перезапустите бот и попробуйте еще раз")
