@@ -54,7 +54,6 @@ async def download_document(message: Message, bot: Bot):
                            'education': df.loc[i, 'образование'],
                            'salary': df.loc[i, 'размер заработной платы: руб.']}
     os.remove(f'{message.document.file_id}vacancy.csv')
-    print(vacancy_dict)
     return vacancy_dict
 # TODO Произвести запись в базу даных
 
