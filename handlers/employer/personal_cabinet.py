@@ -24,6 +24,15 @@ async def process_start_command(message: Message):
     await message.answer(text='Выберете необходимое действие',
                          reply_markup=keyboard_employer_start)
 
+# Этот хэндлер будет срабатывать на апдейт типа CallbackQuery
+# с data 'big_button_1_pressed' - Загрузить вакансии
+@employer_pc_router.callback_query(Text(text=['big_button_1_pressed']))
+async def process_button_1_press(callback: CallbackQuery):
+    await callback.message.answer(
+        text=f'Скачайте, заполните и направьте форму в бот для размещения вакансии\n')
+    await callback.message.answer(text='Скачать форму для заполнения',
+                                  reply_markup=keyboard_url_button)
+
 @employer_pc_router.message()
 @employer_pc_router.callback_query()
 async def process_start_command(message: Message):
