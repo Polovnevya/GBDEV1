@@ -1,9 +1,9 @@
-from typing import Union, List, Tuple
+from typing import Union, List
 from sqlalchemy import inspect, select
 from sqlalchemy.ext.asyncio import create_async_engine, async_sessionmaker, engine
 from .models import Base, Candidate, Employer, Audience, Vacancy, Feedback, Post, Channel
 from config.config import Config
-from .types import CandidateData
+from .mixins.candidate import DAOCandidateMixin
 
 
 class SqlManager:
@@ -42,7 +42,7 @@ class SqlManager:
         self.async_connection = self.async_engine.connect()
 
 
-class SqlHelper:
+class SqlHelper(DAOCandidateMixin):
     def __init__(self, sql_manager: SqlManager):
         self.sql_manager = sql_manager
 
@@ -86,83 +86,3 @@ class SqlHelper:
                         result = await session.execute(select(key).filter_by(**kwargs))
                         if not result:
                             session.add(item)
-
-    # TODO запилить реализацию
-    async def get_candidate_by_id(self, candidate_tg_id: int) -> Union[dict, bool]:
-        """
-        ищет по tg_id кандидата, если он не удален
-        :param candidate_tg_id:
-        :return: возвращает данные кандидата в виде словаря если он имеется в таблице
-                и False если такого кандидата в базе нет
-        """
-        return {'first_name': 'Юрий',
-                'middle_name': 'Андреевич',
-                'last_name': 'Половнев',
-                'gender': 'male',
-                'age': 'senior',  # тут должны быть значения энамов, а не ключи
-                'education': 'higher',
-                'phone': '+79134903369',
-                'tg_id': 618432846}
-
-    # TODO запилить реализацию
-    async def insert_or_update_candidate(self, candidate_data: CandidateData) -> None:
-        """
-        Принимает dataclass с данными кандидата
-        производит добавление кандидата если его нет
-        и
-        обновляет данные кандидата если он уже есть в базе
-        можно разбить на 2 метода добавление и обновление, а этот использовать как фасад
-
-        """
-
-        await self.sql_manager.create_async_session()
-        async with self.sql_manager.async_session() as session:
-            async with session.begin():
-                result = await session.execute(select(Candidate).filter_by(tg_id=candidate_data.tg_id))
-                candidate = result.one_or_none()
-                if not candidate:
-                    session.add(Candidate(**candidate_data.__dict__))
-                else:
-                    candidate.first_name = candidate_data.first_name
-                    candidate.middle_name = candidate_data.middle_name
-                    candidate.education = candidate_data.education
-                    candidate.age = candidate_data.age
-                    candidate.phone = candidate_data.phone
-                    candidate.gender = candidate_data.gender
-
-    # TODO запилить реализацию
-    async def get_active_employers_by_id(self, employer_tg_id: int) -> Union[dict, bool]:
-        """
-        1) не удален
-        :param employer_tg_id:
-        :return:
-        """
-        # pass
-        return {'company_name': 'Марктика',
-                'email': '@mail',
-                'phone': '+79132511727'}
-
-    # TODO запилить реализацию
-    async def get_vacancy_by_id(self, vacancy_id: int) -> Vacancy:
-        """
-        Возвращает 1 вкансию по ее id
-        :param vacancy_id:
-        :return:
-        """
-        pass
-
-    # TODO запилить реализацию
-    async def get_vacancy_by_geolocation(self, longitude: float, latitude: float) -> List[Vacancy]:
-        """
-        возвращает список вакансий, по широте и долготе
-        в определенном радиусе (можно в конфиг пробросить и вытаскивать потом из него)
-        произвести сортировку вакансий по возрастанию расстояния от соискателя - первым делом показываем самые ближние
-
-        запилить датакласс под широту и долготу?
-
-        :param longitude:
-        :param latitude:
-        :return:
-        """
-        pass
-
