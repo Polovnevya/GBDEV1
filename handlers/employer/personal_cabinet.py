@@ -17,7 +17,12 @@ from keyboards.employer import keyboard_employer_start, keyboard_url_button
 
 employer_pc_router: Router = Router()
 
-
+# Этот хэндлер будет срабатывать на команду "/start"
+# и отправлять в чат клавиатуру с инлайн-кнопками
+@employer_pc_router.message(CommandStart())
+async def process_start_command(message: Message):
+    await message.answer(text='Выберете необходимое действие',
+                         reply_markup=keyboard_employer_start)
 
 @employer_pc_router.message()
 @employer_pc_router.callback_query()
