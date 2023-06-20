@@ -1,4 +1,3 @@
-
 import os
 import pandas as pd
 from aiogram import Router, F, Bot
@@ -11,8 +10,9 @@ from keyboards.employer import customer_action_1, customer_action_2
 from keyboards.employer import keyboard_employer_start, keyboard_url_button
 from states.employer import FSMFormEvent
 
-
 employer_pc_router: Router = Router()
+employer_pc_router.message.filter(IsEmployer(config.employers.employers_ids))
+
 
 
 # Этот хэндлер будет срабатывать на команду "/start"
@@ -26,11 +26,14 @@ async def process_start_command(message: Message):
 # Этот хэндлер будет срабатывать на апдейт типа CallbackQuery
 # с data 'big_button_1_pressed' - Загрузить вакансии
 @employer_pc_router.callback_query(Text(text=['big_button_1_pressed']))
+
 async def process_button_1_press(callback: CallbackQuery, state: FSMContext):
+
     await callback.message.answer(
         text=f'Скачайте форму.\nЗаполните и направьте форму в бот для размещения вакансии.\n')
     await callback.message.answer(text='Скачать форму для заполнения.',
                                   reply_markup=keyboard_url_button)
+
     await state.set_state(FSMFormEvent.lreporting)
 
 

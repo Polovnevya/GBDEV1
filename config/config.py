@@ -11,6 +11,11 @@ class DatabaseConfig:
 
 
 @dataclass
+class EmployersIds:
+    employers_ids: list[int]  # Список id администраторов бота
+
+
+@dataclass
 class TgBot:
     token: str  # Токен для доступа к телеграм-боту
     admin_ids: list[int]  # Список id администраторов бота
@@ -20,6 +25,7 @@ class TgBot:
 class Config:
     tg_bot: TgBot
     db: DatabaseConfig
+    employers: EmployersIds
 
 
 def load_config(path: str | None = None) -> Config:
@@ -33,6 +39,8 @@ def load_config(path: str | None = None) -> Config:
                                     db_host=env('DB_HOST'),
                                     db_user=env('DB_USER'),
                                     db_password=env('DB_PASSWORD')),
+                  employers=EmployersIds(employers_ids=list(map(int, env.list('ADMIN_IDS')))),
+
                   )
 
 

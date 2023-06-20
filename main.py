@@ -27,9 +27,9 @@ async def main():
 
     # Регистриуем роутеры в диспетчере
 
-
+    dp.include_router(handlers.employer.personal_cabinet.employer_pc_router)
     dp.include_router(handlers.candidate.personal_cabinet.candidate_pc_router)
-    # dp.include_router(handlers.employer.personal_cabinet.employer_pc_router)
+
 
     dp.include_router(handlers.common.echo.router)
 
