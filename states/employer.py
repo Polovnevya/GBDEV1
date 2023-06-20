@@ -7,3 +7,8 @@ class FSMEmployerPoll(StatesGroup):
     phone = State()
     geolocation = State()
     load_pd = State()
+
+
+class FSMFormEvent(StatesGroup):
+    vacancy = State()
+    lreporting = State()
