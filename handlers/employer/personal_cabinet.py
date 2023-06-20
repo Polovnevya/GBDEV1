@@ -6,11 +6,14 @@ from aiogram.enums import ContentType
 from aiogram.filters import CommandStart, Text
 from aiogram.types import Message, CallbackQuery
 
+from filters.employer import IsEmployer
 from keyboards.employer import customer_action_1, customer_action_2
 from keyboards.employer import keyboard_employer_start, keyboard_url_button
+from config.config import config
 
 
 employer_pc_router: Router = Router()
+employer_pc_router.message.filter(IsEmployer(config.employers.employers_ids))
 
 
 # Этот хэндлер будет срабатывать на команду "/start"
