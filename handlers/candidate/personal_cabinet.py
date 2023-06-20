@@ -194,4 +194,6 @@ async def process_show_vacancy_without_geo(message: Message):
 @candidate_pc_router.callback_query()
 async def process_start_command(query: CallbackQuery):
     a = 1
+    # candidate = await db.get_candidate_by_id(618432846)
+    # print(candidate)
     await query.message.answer("Вы что то делаете не так, перезапустите бот и попробуйте еще раз")
