@@ -2,11 +2,13 @@ import os
 import pandas as pd
 from aiogram import Router, F, Bot
 from aiogram.enums import ContentType
-from aiogram.filters import CommandStart, Text
+from aiogram.fsm.context import FSMContext
+from aiogram.filters import CommandStart, Text, StateFilter
 from aiogram.types import Message, CallbackQuery
 
 from keyboards.employer import customer_action_1, customer_action_2
 from keyboards.employer import keyboard_employer_start, keyboard_url_button
+from states.employer import FSMFormEvent
 
 
 employer_pc_router: Router = Router()
@@ -23,15 +25,17 @@ async def process_start_command(message: Message):
 # Этот хэндлер будет срабатывать на апдейт типа CallbackQuery
 # с data 'big_button_1_pressed' - Загрузить вакансии
 @employer_pc_router.callback_query(Text(text=['big_button_1_pressed']))
-async def process_button_1_press(callback: CallbackQuery):
+async def process_button_1_press(callback: CallbackQuery, state: FSMContext):
     await callback.message.answer(
         text=f'Скачайте форму.\nЗаполните и направьте форму в бот для размещения вакансии.\n')
     await callback.message.answer(text='Скачать форму для заполнения.',
                                   reply_markup=keyboard_url_button)
+    await state.set_state(FSMFormEvent.lreporting)
 
 
 # Этот хэндлер будет срабатывать на отправку боту файла
-@employer_pc_router.message(F.content_type == ContentType.DOCUMENT)
+@employer_pc_router.message(F.content_type == ContentType.DOCUMENT,
+                            StateFilter(FSMFormEvent.lreporting))
 async def download_document(message: Message, bot: Bot):
     await bot.download(
         message.document,
@@ -50,6 +54,7 @@ async def download_document(message: Message, bot: Bot):
                            'education': df.loc[i, 'образование'],
                            'salary': df.loc[i, 'размер заработной платы: руб.']}
     os.remove(f'{message.document.file_id}vacancy.csv')
+    print(vacancy_dict)
     return vacancy_dict
 # TODO Произвести запись в базу даных
 
