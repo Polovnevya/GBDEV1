@@ -31,8 +31,8 @@ async def process_start_command(message: Message):
 @employer_pc_router.callback_query(Text(text=['big_button_1_pressed']))
 async def process_button_1_press(callback: CallbackQuery):
     await callback.message.answer(
-        text=f'Скачайте, заполните и направьте форму в бот для размещения вакансии\n')
-    await callback.message.answer(text='Скачать форму для заполнения',
+        text=f'Скачайте форму.\nЗаполните и направьте форму в бот для размещения вакансии.\n')
+    await callback.message.answer(text='Скачать форму для заполнения.',
                                   reply_markup=keyboard_url_button)
 
 
