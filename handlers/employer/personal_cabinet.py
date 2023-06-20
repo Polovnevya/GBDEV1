@@ -38,8 +38,8 @@ async def download_document(message: Message, bot: Bot):
         destination=f"{message.document.file_id}vacancy.xlsx")
     df = pd.read_excel(f'{message.document.file_id}vacancy.xlsx')
     df.to_csv(f'{message.document.file_id}vacancy.csv', index=False)
-    os.remove(f'C:\\Users\\User\\Documents\\GitHub\\{message.document.file_id}vacancy.xlsx')
-    df = pd.read_csv(f'C:\\Users\\User\\Documents\\GitHub\\{message.document.file_id}vacancy.csv')
+    os.remove(f'{message.document.file_id}vacancy.xlsx')
+    df = pd.read_csv(f'{message.document.file_id}vacancy.csv')
     vacancy_dict = {}
     for i in range(len(df)):
         vacancy_dict[i] = {'vacancy_name': df.loc[i, 'должность'],
@@ -49,9 +49,20 @@ async def download_document(message: Message, bot: Bot):
                            'gender': df.loc[i, 'пол'],
                            'education': df.loc[i, 'образование'],
                            'salary': df.loc[i, 'размер заработной платы: руб.']}
-    os.remove(f'C:\\Users\\User\\Documents\\GitHub\\{message.document.file_id}vacancy.csv')
+    os.remove(f'{message.document.file_id}vacancy.csv')
     return vacancy_dict
 # TODO Произвести запись в базу даных
+
+
+# Этот хэндлер будет срабатывать на апдейт типа CallbackQuery
+# с data 'big_button_2_pressed'
+@employer_pc_router.callback_query(Text(text=['big_button_2_pressed']))
+async def process_button_2_press(callback: CallbackQuery):
+    if callback.message.text != f'Была нажата кнопка "{customer_action_2}"':
+        await callback.message.edit_text(
+            text=f'Была нажата кнопка "{customer_action_2}"',
+            reply_markup=callback.message.reply_markup)
+    await callback.answer(text=f'Ура! Нажата кнопка "{customer_action_2}"')
 
 
 @employer_pc_router.message()
