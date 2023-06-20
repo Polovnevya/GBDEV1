@@ -1,5 +1,7 @@
+
 from aiogram.types import (ReplyKeyboardMarkup, KeyboardButton, KeyboardButtonPollType,
                            InlineKeyboardButton, InlineKeyboardMarkup)
+
 from aiogram.utils.keyboard import ReplyKeyboardBuilder
 
 # Создаем кнопки
@@ -26,6 +28,7 @@ kb_contact: ReplyKeyboardMarkup = kb_contact_builder.as_markup(
 kb_geo: ReplyKeyboardMarkup = kb_geo_builder.as_markup(
     resize_keyboard=True,
     one_time_keyboard=True)
+
 
 
 customer_action_1 = 'Загрузить вакансии'
@@ -55,3 +58,4 @@ keyboard_employer_start: InlineKeyboardMarkup = InlineKeyboardMarkup(
 # Создаем объект инлайн-клавиатуры
 keyboard_url_button: InlineKeyboardMarkup = InlineKeyboardMarkup(
     inline_keyboard=[[url_button]])
+

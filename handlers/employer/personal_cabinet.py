@@ -1,3 +1,4 @@
+
 import os
 import pandas as pd
 from aiogram import Router, F, Bot
@@ -67,6 +68,7 @@ async def process_button_2_press(callback: CallbackQuery):
             text=f'Была нажата кнопка "{customer_action_2}"',
             reply_markup=callback.message.reply_markup)
     await callback.answer(text=f'Ура! Нажата кнопка "{customer_action_2}"')
+
 
 
 @employer_pc_router.message()
