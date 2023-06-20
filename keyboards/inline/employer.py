@@ -1,22 +1,22 @@
-from typing import Optional, Type
 from aiogram.filters.callback_data import CallbackData
 from aiogram.utils.keyboard import InlineKeyboardBuilder
 
-from db.types import GenderEnum, EducationEnum, AgeCategoriesEnum
+
+class EmployerLoadCB(CallbackData, prefix="ELCB"):
+    value: str
 
 
-class PersonalData(CallbackData, prefix="PD"):
-    action: str
-    value: Optional[str]
+class EmployerReportingCB(CallbackData, prefix="ERCB"):
+    value: str
 
 
-def get_personal_data_keyboard():
+def get_start_employer_keyboard():
     builder = InlineKeyboardBuilder()
     builder.button(
-        text=f"Да", callback_data=PersonalData(action="Yes", value="1")
+        text=f"Загрузить вакансии", callback_data=EmployerLoadCB(value="load")
     )
     builder.button(
-        text=f"Нет", callback_data=PersonalData(action="No", value="0")
+        text=f"Выгрузить отчётность", callback_data=EmployerReportingCB(value="reporting")
     )
-    builder.adjust(2)
+    builder.adjust(1)
     return builder.as_markup()
