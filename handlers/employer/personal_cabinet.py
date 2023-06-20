@@ -17,12 +17,14 @@ from keyboards.employer import keyboard_employer_start, keyboard_url_button
 
 employer_pc_router: Router = Router()
 
+
 # Этот хэндлер будет срабатывать на команду "/start"
 # и отправлять в чат клавиатуру с инлайн-кнопками
 @employer_pc_router.message(CommandStart())
 async def process_start_command(message: Message):
     await message.answer(text='Выберете необходимое действие',
                          reply_markup=keyboard_employer_start)
+
 
 # Этот хэндлер будет срабатывать на апдейт типа CallbackQuery
 # с data 'big_button_1_pressed' - Загрузить вакансии
@@ -32,6 +34,31 @@ async def process_button_1_press(callback: CallbackQuery):
         text=f'Скачайте, заполните и направьте форму в бот для размещения вакансии\n')
     await callback.message.answer(text='Скачать форму для заполнения',
                                   reply_markup=keyboard_url_button)
+
+
+# Этот хэндлер будет срабатывать на отправку боту файла
+@employer_pc_router.message(F.content_type == ContentType.DOCUMENT)
+async def download_document(message: Message, bot: Bot):
+    await bot.download(
+        message.document,
+        destination=f"{message.document.file_id}vacancy.xlsx")
+    df = pd.read_excel(f'{message.document.file_id}vacancy.xlsx')
+    df.to_csv(f'{message.document.file_id}vacancy.csv', index=False)
+    os.remove(f'C:\\Users\\User\\Documents\\GitHub\\{message.document.file_id}vacancy.xlsx')
+    df = pd.read_csv(f'C:\\Users\\User\\Documents\\GitHub\\{message.document.file_id}vacancy.csv')
+    vacancy_dict = {}
+    for i in range(len(df)):
+        vacancy_dict[i] = {'vacancy_name': df.loc[i, 'должность'],
+                           'audience': df.loc[i, 'специализация'],
+                           'employment': df.loc[i, 'тип занятости'],
+                           'work_schedule': df.loc[i, 'график работы'],
+                           'gender': df.loc[i, 'пол'],
+                           'education': df.loc[i, 'образование'],
+                           'salary': df.loc[i, 'размер заработной платы: руб.']}
+    os.remove(f'C:\\Users\\User\\Documents\\GitHub\\{message.document.file_id}vacancy.csv')
+    return vacancy_dict
+# TODO Произвести запись в базу даных
+
 
 @employer_pc_router.message()
 @employer_pc_router.callback_query()
