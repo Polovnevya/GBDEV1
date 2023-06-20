@@ -10,5 +10,4 @@ class FSMEmployerPoll(StatesGroup):
 
 
 class FSMFormEvent(StatesGroup):
-    vacancy = State()
     lreporting = State()
