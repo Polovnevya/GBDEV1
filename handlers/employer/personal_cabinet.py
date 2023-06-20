@@ -2,16 +2,10 @@ import os
 import pandas as pd
 from aiogram import Router, F, Bot
 from aiogram.enums import ContentType
-from aiogram.filters import Command, StateFilter, CommandStart, Text
-from aiogram.fsm.context import FSMContext
-from aiogram.types import Message, CallbackQuery, ReplyKeyboardRemove
-# from db.models import GenderEnum, AgeCategoriesEnum, EducationEnum
-from keyboards.candidate import kb_contact, kb_geo
+from aiogram.filters import CommandStart, Text
+from aiogram.types import Message, CallbackQuery
+
 from keyboards.employer import customer_action_1, customer_action_2
-from keyboards.inline.employer import get_personal_data_keyboard, PersonalData
-from keyboards.inline.candidate import EducationCallback
-from loader import db
-from states.employer import FSMEmployerPoll
 from keyboards.employer import keyboard_employer_start, keyboard_url_button
 
 
