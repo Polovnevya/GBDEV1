@@ -39,7 +39,7 @@ def load_config(path: str | None = None) -> Config:
                                     db_host=env('DB_HOST'),
                                     db_user=env('DB_USER'),
                                     db_password=env('DB_PASSWORD')),
-                  employers=EmployersIds(employers_ids=list(map(int, env.list('ADMIN_IDS')))),
+                  employers=EmployersIds(employers_ids=list(map(int, env.list('EMPLOYERS_IDS')))),
 
                   )
 
