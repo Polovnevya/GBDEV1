@@ -38,14 +38,14 @@ async def process_button_load_press(callback: CallbackQuery, state: FSMContext, 
 @employer_pc_router.message(F.content_type == ContentType.DOCUMENT,
                             StateFilter(FSMFormEvent.lreporting))
 async def download_document(message: Message, bot: Bot):
+    path_to_download_form = f"{message.from_user.id} {message.date.strftime('%Y-%m-%d %H-%M-%S')}"
     await bot.download(
         message.document,
-        destination=f"{message.document.file_id}vacancy.xlsx")
+        destination=f'{path_to_download_form}.xlsx')
     try:
-        df = pd.read_excel(f'{message.document.file_id}vacancy.xlsx')
-        df.to_csv(f'{message.document.file_id}vacancy.csv', index=False)
-        # os.remove(f'{message.document.file_id}vacancy.xlsx')
-        df = pd.read_csv(f'{message.document.file_id}vacancy.csv')
+        df = pd.read_excel(f'{path_to_download_form}.xlsx')
+        df.to_csv(f'{path_to_download_form}.csv', index=False)
+        df = pd.read_csv(f'{path_to_download_form}.csv')
         vacancy_dict = {}
         for i in range(len(df)):
             vacancy_dict[i] = {'vacancy_name': df.loc[i, 'должность'],
@@ -55,17 +55,21 @@ async def download_document(message: Message, bot: Bot):
                                'gender': df.loc[i, 'пол'],
                                'education': df.loc[i, 'образование'],
                                'salary': df.loc[i, 'размер заработной платы: руб.']}
-        os.remove(f'{message.document.file_id}vacancy.csv')
+        os.remove(f'{path_to_download_form}.csv')
         await message.answer("Файл поступил и обработан.")
         return vacancy_dict
     except ValueError:
         await message.answer(f'Вы направили файл иного формата.\n'
                              f'Заполните предоставленную форму и отправьте её в бот.')
+        if os.path.isfile(f'{path_to_download_form}.xlsx'):
+            os.remove(f'{path_to_download_form}.xlsx')
     except KeyError:
         await message.answer(f'Вы направили файл содержание котого не соответствует направленной вам форме для заполнения.\n'
                              f'Заполните предоставленную форму и отправьте её в бот.')
-        if os.path.isfile(f'{message.document.file_id}vacancy.csv'):
-            os.remove(f'{message.document.file_id}vacancy.csv')
+        if os.path.isfile(f'{path_to_download_form}.xlsx'):
+            os.remove(f'{path_to_download_form}.xlsx')
+        if os.path.isfile(f'{path_to_download_form}.csv'):
+            os.remove(f'{path_to_download_form}.csv')
 # TODO Произвести запись в базу даных
 
 
