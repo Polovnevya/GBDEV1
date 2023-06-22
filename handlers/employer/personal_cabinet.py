@@ -26,7 +26,7 @@ async def process_start_command(message: Message):
 # с data 'big_button_1_pressed' - Загрузить вакансии
 @employer_pc_router.callback_query(EmployerLoadCB.filter())
 async def process_button_load_press(callback: CallbackQuery, state: FSMContext, bot: Bot):
-    document = FSInputFile(path='GBDEV1/files/work/common/vacancy_template.xlsx')
+    document = FSInputFile(path='files/work/common/vacancy_template.xlsx')
     await bot.send_document(callback.message.chat.id, document=document)
     await callback.message.answer(
         text=f'Скачайте форму.\nЗаполните и направьте форму в бот для размещения вакансии.\n')
