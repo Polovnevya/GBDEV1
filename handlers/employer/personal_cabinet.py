@@ -26,7 +26,7 @@ async def process_start_command(message: Message):
 # с data 'big_button_1_pressed' - Загрузить вакансии
 @employer_pc_router.callback_query(EmployerLoadCB.filter())
 async def process_button_load_press(callback: CallbackQuery, state: FSMContext, bot: Bot):
-    document = FSInputFile(path='GBDEV1/files/work/common/vacancy_template.xlsx')
+    document = FSInputFile(path='files/work/common/vacancy_template.xlsx')
     await bot.send_document(callback.message.chat.id, document=document)
     await callback.message.answer(
         text=f'Скачайте форму.\nЗаполните и направьте форму в бот для размещения вакансии.\n')
@@ -38,11 +38,11 @@ async def process_button_load_press(callback: CallbackQuery, state: FSMContext, 
 @employer_pc_router.message(F.content_type == ContentType.DOCUMENT,
                             StateFilter(FSMFormEvent.lreporting))
 async def download_document(message: Message, bot: Bot):
-    if not os.path.exists(f"GBDEV1/downloads/{message.from_user.id}"):
-        os.mkdir(f"GBDEV1/downloads/{message.from_user.id}")
-    if not os.path.exists(f"GBDEV1/downloads/{message.from_user.id}/{message.date.strftime('%Y-%m-%d')}"):
-        os.mkdir(f"GBDEV1/downloads/{message.from_user.id}/{message.date.strftime('%Y-%m-%d')}")
-    name_form = f"GBDEV1/downloads/{message.from_user.id}/{message.date.strftime('%Y-%m-%d')}/{message.document.file_id}"
+    if not os.path.exists(f"downloads/{message.from_user.id}"):
+        os.mkdir(f"downloads/{message.from_user.id}")
+    if not os.path.exists(f"downloads/{message.from_user.id}/{message.date.strftime('%Y-%m-%d')}"):
+        os.mkdir(f"downloads/{message.from_user.id}/{message.date.strftime('%Y-%m-%d')}")
+    name_form = f"downloads/{message.from_user.id}/{message.date.strftime('%Y-%m-%d')}/{message.document.file_id}"
     await bot.download(
         message.document,
         destination=f'{name_form}.xlsx')
