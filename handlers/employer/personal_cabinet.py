@@ -26,7 +26,7 @@ async def process_start_command(message: Message):
 # с data 'big_button_1_pressed' - Загрузить вакансии
 @employer_pc_router.callback_query(EmployerLoadCB.filter())
 async def process_button_load_press(callback: CallbackQuery, state: FSMContext, bot: Bot):
-    document = FSInputFile(path='files/work/common/vacancy_template.xlsx')
+    document = FSInputFile(path='GBDEV1/files/work/common/vacancy_template.xlsx')
     await bot.send_document(callback.message.chat.id, document=document)
     await callback.message.answer(
         text=f'Скачайте форму.\nЗаполните и направьте форму в бот для размещения вакансии.\n')
@@ -38,14 +38,18 @@ async def process_button_load_press(callback: CallbackQuery, state: FSMContext, 
 @employer_pc_router.message(F.content_type == ContentType.DOCUMENT,
                             StateFilter(FSMFormEvent.lreporting))
 async def download_document(message: Message, bot: Bot):
-    path_to_download_form = f"{message.from_user.id} {message.date.strftime('%Y-%m-%d %H-%M-%S')}"
+    if not os.path.exists(f"GBDEV1/downloads/{message.from_user.id}"):
+        os.mkdir(f"GBDEV1/downloads/{message.from_user.id}")
+    if not os.path.exists(f"GBDEV1/downloads/{message.from_user.id}/{message.date.strftime('%Y-%m-%d')}"):
+        os.mkdir(f"GBDEV1/downloads/{message.from_user.id}/{message.date.strftime('%Y-%m-%d')}")
+    name_form = f"GBDEV1/downloads/{message.from_user.id}/{message.date.strftime('%Y-%m-%d')}/{message.document.file_id}"
     await bot.download(
         message.document,
-        destination=f'{path_to_download_form}.xlsx')
+        destination=f'{name_form}.xlsx')
     try:
-        df = pd.read_excel(f'{path_to_download_form}.xlsx')
-        df.to_csv(f'{path_to_download_form}.csv', index=False)
-        df = pd.read_csv(f'{path_to_download_form}.csv')
+        df = pd.read_excel(f'{name_form}.xlsx')
+        df.to_csv(f'{name_form}.csv', index=False)
+        df = pd.read_csv(f'{name_form}.csv')
         vacancy_dict = {}
         for i in range(len(df)):
             vacancy_dict[i] = {'vacancy_name': df.loc[i, 'должность'],
@@ -55,21 +59,21 @@ async def download_document(message: Message, bot: Bot):
                                'gender': df.loc[i, 'пол'],
                                'education': df.loc[i, 'образование'],
                                'salary': df.loc[i, 'размер заработной платы: руб.']}
-        os.remove(f'{path_to_download_form}.csv')
+        os.remove(f'{name_form}.csv')
         await message.answer("Файл поступил и обработан.")
         return vacancy_dict
     except ValueError:
         await message.answer(f'Вы направили файл иного формата.\n'
                              f'Заполните предоставленную форму и отправьте её в бот.')
-        if os.path.isfile(f'{path_to_download_form}.xlsx'):
-            os.remove(f'{path_to_download_form}.xlsx')
+        if os.path.isfile(f'{name_form}.xlsx'):
+            os.remove(f'{name_form}.xlsx')
     except KeyError:
         await message.answer(f'Вы направили файл содержание котого не соответствует направленной вам форме для заполнения.\n'
                              f'Заполните предоставленную форму и отправьте её в бот.')
-        if os.path.isfile(f'{path_to_download_form}.xlsx'):
-            os.remove(f'{path_to_download_form}.xlsx')
-        if os.path.isfile(f'{path_to_download_form}.csv'):
-            os.remove(f'{path_to_download_form}.csv')
+        if os.path.isfile(f'{name_form}.xlsx'):
+            os.remove(f'{name_form}.xlsx')
+        if os.path.isfile(f'{name_form}.csv'):
+            os.remove(f'{name_form}.csv')
 # TODO Произвести запись в базу даных
 
 
