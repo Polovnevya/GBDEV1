@@ -56,11 +56,14 @@ async def download_document(message: Message, bot: Bot):
                                'education': df.loc[i, 'образование'],
                                'salary': df.loc[i, 'размер заработной платы: руб.']}
         os.remove(f'{message.document.file_id}vacancy.csv')
-        await message.answer("Файл поступил и обработан")
+        await message.answer("Файл поступил и обработан.")
         return vacancy_dict
-    except (ValueError, KeyError):
+    except ValueError:
         await message.answer(f'Вы направили файл иного формата.\n'
-                             f'Заполните предоставленную форму и отправьте её в бот')
+                             f'Заполните предоставленную форму и отправьте её в бот.')
+    except KeyError:
+        await message.answer(f'Вы направили файл содержание котого не соответствует направленной вам форме для заполнения.\n'
+                             f'Заполните предоставленную форму и отправьте её в бот.')
         if os.path.isfile(f'{message.document.file_id}vacancy.csv'):
             os.remove(f'{message.document.file_id}vacancy.csv')
 # TODO Произвести запись в базу даных
