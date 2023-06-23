@@ -38,24 +38,42 @@ async def process_button_load_press(callback: CallbackQuery, state: FSMContext, 
 @employer_pc_router.message(F.content_type == ContentType.DOCUMENT,
                             StateFilter(FSMFormEvent.lreporting))
 async def download_document(message: Message, bot: Bot):
+    if not os.path.exists(f"downloads/{message.from_user.id}"):
+        os.mkdir(f"downloads/{message.from_user.id}")
+    if not os.path.exists(f"downloads/{message.from_user.id}/{message.date.strftime('%Y-%m-%d')}"):
+        os.mkdir(f"downloads/{message.from_user.id}/{message.date.strftime('%Y-%m-%d')}")
+    name_form = f"downloads/{message.from_user.id}/{message.date.strftime('%Y-%m-%d')}/{message.document.file_id}"
     await bot.download(
         message.document,
-        destination=f"{message.document.file_id}vacancy.xlsx")
-    df = pd.read_excel(f'{message.document.file_id}vacancy.xlsx')
-    df.to_csv(f'{message.document.file_id}vacancy.csv', index=False)
-    os.remove(f'{message.document.file_id}vacancy.xlsx')
-    df = pd.read_csv(f'{message.document.file_id}vacancy.csv')
-    vacancy_dict = {}
-    for i in range(len(df)):
-        vacancy_dict[i] = {'vacancy_name': df.loc[i, 'должность'],
-                           'audience': df.loc[i, 'специализация'],
-                           'employment': df.loc[i, 'тип занятости'],
-                           'work_schedule': df.loc[i, 'график работы'],
-                           'gender': df.loc[i, 'пол'],
-                           'education': df.loc[i, 'образование'],
-                           'salary': df.loc[i, 'размер заработной платы: руб.']}
-    os.remove(f'{message.document.file_id}vacancy.csv')
-    return vacancy_dict
+        destination=f'{name_form}.xlsx')
+    try:
+        df = pd.read_excel(f'{name_form}.xlsx')
+        df.to_csv(f'{name_form}.csv', index=False)
+        df = pd.read_csv(f'{name_form}.csv')
+        vacancy_dict = {}
+        for i in range(len(df)):
+            vacancy_dict[i] = {'vacancy_name': df.loc[i, 'должность'],
+                               'audience': df.loc[i, 'специализация'],
+                               'employment': df.loc[i, 'тип занятости'],
+                               'work_schedule': df.loc[i, 'график работы'],
+                               'gender': df.loc[i, 'пол'],
+                               'education': df.loc[i, 'образование'],
+                               'salary': df.loc[i, 'размер заработной платы: руб.']}
+        os.remove(f'{name_form}.csv')
+        await message.answer("Файл поступил и обработан.")
+        return vacancy_dict
+    except ValueError:
+        await message.answer(f'Вы направили файл иного формата.\n'
+                             f'Заполните предоставленную форму и отправьте её в бот.')
+        if os.path.isfile(f'{name_form}.xlsx'):
+            os.remove(f'{name_form}.xlsx')
+    except KeyError:
+        await message.answer(f'Вы направили файл содержание котого не соответствует направленной вам форме для заполнения.\n'
+                             f'Заполните предоставленную форму и отправьте её в бот.')
+        if os.path.isfile(f'{name_form}.xlsx'):
+            os.remove(f'{name_form}.xlsx')
+        if os.path.isfile(f'{name_form}.csv'):
+            os.remove(f'{name_form}.csv')
 # TODO Произвести запись в базу даных
 
 
