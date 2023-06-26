@@ -1,21 +1,28 @@
 import enum
 from dataclasses import dataclass
+from datetime import datetime
 
 
 # dataclasses
 @dataclass
-class DAOFeedback:
+class DAOFeedbackData:
+    id: int
     candidate_id: int
-    id_vacancy: int
+    vacancy_id: int
 
 
 @dataclass
-class DAOVacancy:
+class DAOVacancyData:
     id: int
-    name: str
+    employer_id: int
+    audience_id: int
     work_schedule: str
     employment: str
     salary: float
+    geolocation: str
+    is_open: bool
+    date_start: datetime
+    date_end: datetime
 
 
 @dataclass
@@ -27,6 +34,14 @@ class DAOCandidateData:
     age: str
     education: str
     phone: str
+    tg_id: str
+
+
+@dataclass
+class DAOEmployerData:
+    company_name: str
+    phone: str
+    email: str
     tg_id: str
 
 
