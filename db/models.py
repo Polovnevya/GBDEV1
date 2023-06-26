@@ -55,12 +55,12 @@ class Candidate(Base, DateBaseModel):
         unique=True,
     )
 
-    def __repr__(self):
-        return f"<id: {self.id}, tg_id: {self.tg_id}, " \
-               f"first_name: {self.first_name}, middle_name: {self.last_name}, " \
-               f"last_name: {self.last_name}, gender: {self.gender}, age: {self.age}, education: {self.education}, " \
-               f"phone: {self.phone}, " \
-               f"created_at: {self.created_at}, updated_at: {self.updated_at}, deleted_at: {self.updated_at}>"
+    # def __repr__(self):
+    #     return f"<id: {self.id}, tg_id: {self.tg_id}, " \
+    #            f"first_name: {self.first_name}, middle_name: {self.last_name}, " \
+    #            f"last_name: {self.last_name}, gender: {self.gender}, age: {self.age}, education: {self.education}, " \
+    #            f"phone: {self.phone}, " \
+    #            f"created_at: {self.created_at}, updated_at: {self.updated_at}, deleted_at: {self.updated_at}>"
 
 
 class Audience(Base, DateBaseModel):
@@ -70,9 +70,9 @@ class Audience(Base, DateBaseModel):
     name: Mapped[str] = mapped_column(String, nullable=False)
     vacancy: Mapped[List["Vacancy"]] = relationship()
 
-    def __repr__(self):
-        return f"<id: {self.id}, name: {self.name},  " \
-               f"created_at: {self.created_at}, updated_at: {self.updated_at}, deleted_at: {self.updated_at}>"
+    # def __repr__(self):
+    #     return f"<id: {self.id}, name: {self.name},  " \
+    #            f"created_at: {self.created_at}, updated_at: {self.updated_at}, deleted_at: {self.updated_at}>"
 
 
 class Employer(Base, ContactBaseModel, DateBaseModel):
@@ -81,15 +81,14 @@ class Employer(Base, ContactBaseModel, DateBaseModel):
     id: Mapped[int] = mapped_column(primary_key=True)
     vacancy: Mapped[List["Vacancy"]] = relationship()
     user_name: Mapped[str] = mapped_column(String(50), unique=True, nullable=False)
-    user_id: Mapped[int] = mapped_column(unique=True, nullable=False)
-    chat_id: Mapped[int] = mapped_column(unique=True, nullable=False)
+    tg_id: Mapped[int] = mapped_column(unique=True, nullable=False)
     company_name = mapped_column(String(50), nullable=False)
 
-    def __repr__(self):
-        return f"<id: {self.id}, user_name: {self.user_name}, user_id: {self.user_id}, " \
-               f"chat_id: {self.chat_id}, company_name: {self.company_name}, " \
-               f"phone: {self.phone}, email: {self.email}, " \
-               f"created_at: {self.created_at}, updated_at: {self.updated_at}, deleted_at: {self.updated_at}>"
+    # def __repr__(self):
+    #     return f"<id: {self.id}, user_name: {self.user_name}, tg_id: {self.tg_id}, " \
+    #            f"company_name: {self.company_name}, " \
+    #            f"phone: {self.phone}, email: {self.email}, " \
+    #            f"created_at: {self.created_at}, updated_at: {self.updated_at}, deleted_at: {self.updated_at}>"
 
 
 class Vacancy(Base, DateBaseModel):
@@ -109,12 +108,12 @@ class Vacancy(Base, DateBaseModel):
     date_start: Mapped[datetime] = mapped_column(DateTime)
     date_end: Mapped[datetime] = mapped_column(DateTime)
 
-    def __repr__(self):
-        return f"<id: {self.id}, vacancy_name: {self.name}, employer_id: {self.employer_id}, " \
-               f"audience_id: {self.audience_id}, work_schedule: {self.work_schedule}, salary: {self.salary}, " \
-               f"geolocation: {self.geolocation}, is_open: {self.is_open}, " \
-               f" date_start: {self.date_start}, date_end: {self.date_end}, " \
-               f"created_at: {self.created_at}, updated_at: {self.updated_at}, deleted_at: {self.updated_at}>"
+    # def __repr__(self):
+    #     return f"<id: {self.id}, vacancy_name: {self.name}, employer_id: {self.employer_id}, " \
+    #            f"audience_id: {self.audience_id}, work_schedule: {self.work_schedule}, salary: {self.salary}, " \
+    #            f"geolocation: {self.geolocation}, is_open: {self.is_open}, " \
+    #            f" date_start: {self.date_start}, date_end: {self.date_end}, " \
+    #            f"created_at: {self.created_at}, updated_at: {self.updated_at}, deleted_at: {self.updated_at}>"
 
 
 class Feedback(Base, DateBaseModel):
@@ -124,9 +123,9 @@ class Feedback(Base, DateBaseModel):
     candidate_id: Mapped[int] = mapped_column(ForeignKey("candidates.id"), nullable=False)
     vacancy_id: Mapped[int] = mapped_column(ForeignKey("vacancies.id"), nullable=False)
 
-    def __repr__(self):
-        return f"<id: {self.id}, candidate_id: {self.candidate_id}, vacancy_id: {self.vacancy_id}, " \
-               f"created_at: {self.created_at}, updated_at: {self.updated_at}, deleted_at: {self.updated_at}>"
+    # def __repr__(self):
+    #     return f"<id: {self.id}, candidate_id: {self.candidate_id}, vacancy_id: {self.vacancy_id}, " \
+    #            f"created_at: {self.created_at}, updated_at: {self.updated_at}, deleted_at: {self.updated_at}>"
 
 
 channel_to_audience = Table(
@@ -145,9 +144,9 @@ class Channel(Base, DateBaseModel):
     channel_id: Mapped[int] = mapped_column(unique=True, nullable=False)
     audience: Mapped[List[Audience]] = relationship(secondary=channel_to_audience)
 
-    def __repr__(self):
-        return f"<id: {self.id}, name: {self.name}, channel_id: {self.channel_id}, audience: {self.audience.key}, " \
-               f"created_at: {self.created_at}, updated_at: {self.updated_at}, deleted_at: {self.updated_at}>"
+    # def __repr__(self):
+    #     return f"<id: {self.id}, name: {self.name}, channel_id: {self.channel_id}, audience: {self.audience}, " \
+    #            f"created_at: {self.created_at}, updated_at: {self.updated_at}, deleted_at: {self.updated_at}>"
 
 
 class Post(Base, DateBaseModel):
@@ -158,7 +157,7 @@ class Post(Base, DateBaseModel):
     vacancy_id: Mapped[int] = mapped_column(ForeignKey("vacancies.id"), nullable=False)
     channel_id: Mapped[int] = mapped_column(ForeignKey("channels.id"), nullable=False)
 
-    def __repr__(self):
-        return f"<id: {self.id}, vacancy_id: {self.vacancy_id.key}, message_id: {self.message_id} " \
-               f"channel_id {self.channel_id}, " \
-               f"created_at: {self.created_at}, updated_at: {self.updated_at}, deleted_at: {self.updated_at}>"
+    # def __repr__(self):
+    #     return f"<id: {self.id}, vacancy_id: {self.vacancy_id}, message_id: {self.message_id} " \
+    #            f"channel_id {self.channel_id}, " \
+    #            f"created_at: {self.created_at}, updated_at: {self.updated_at}, deleted_at: {self.updated_at}>"

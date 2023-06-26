@@ -1,13 +1,13 @@
 from aiogram import Bot, Dispatcher
 import logging
 from config.config import config
-from db.sql_facade import SqlHelper, SqlManager
+from db.sql_facade import DAO, SqlManager
 
 # Инициализируем логгер
 logger = logging.getLogger(__name__)
 
 # Инициализируем базу данных
-db: SqlHelper = SqlHelper(SqlManager(config))
+db: DAO = DAO(SqlManager(config))
 
 # Инициализируем бот и диспетчер
 bot: Bot = Bot(token=config.tg_bot.token,

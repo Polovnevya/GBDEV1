@@ -1,9 +1,11 @@
-from typing import Union, List
 from sqlalchemy import inspect, select
 from sqlalchemy.ext.asyncio import create_async_engine, async_sessionmaker, engine
 from .models import Base, Candidate, Employer, Audience, Vacancy, Feedback, Post, Channel
 from config.config import Config
 from .mixins.candidate import DAOCandidateMixin
+from .mixins.vacancy import DAOVacancyMixin
+from .mixins.feedback import DAOFeedbackMixin
+from .mixins.emloyer import DAOEmployerData
 
 
 class SqlManager:
@@ -42,7 +44,7 @@ class SqlManager:
         self.async_connection = self.async_engine.connect()
 
 
-class SqlHelper(DAOCandidateMixin):
+class DAO(DAOCandidateMixin, DAOFeedbackMixin, DAOVacancyMixin, DAOEmployerData):
     def __init__(self, sql_manager: SqlManager):
         self.sql_manager = sql_manager
 
@@ -82,7 +84,9 @@ class SqlHelper(DAOCandidateMixin):
                 for key, items in objects.items():
                     for item in items:
                         kwargs = item.__dict__
-                        del kwargs['_sa_instance_state']
-                        result = await session.execute(select(key).filter_by(**kwargs))
-                        if not result:
-                            session.add(item)
+                        kwargs.pop('_sa_instance_state')
+                        stmt = select(key).filter_by(**kwargs)
+                        result = await session.scalars(stmt)
+                        if not result.first():
+                            session.add(key(**kwargs))
+                            session.commit()

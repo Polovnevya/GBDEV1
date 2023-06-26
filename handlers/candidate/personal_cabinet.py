@@ -6,7 +6,7 @@ from aiogram.filters import Command, StateFilter
 from aiogram.fsm.context import FSMContext
 from aiogram.types import Message, CallbackQuery, ReplyKeyboardRemove
 from db.models import GenderEnum, AgeCategoriesEnum, EducationEnum, Feedback
-from db.types import DAOFeedback, DAOVacancy, DAOCandidateData
+from db.types import DAOFeedbackData, DAOVacancyData, DAOCandidateData
 from keyboards.candidate import kb_contact, kb_geo
 from keyboards.inline.candidate import (
     get_gender_keyboard_fab, GenderCallback, AgeCallback, get_age_keyboard_fab,
@@ -131,14 +131,14 @@ async def process_get_phone(message: Message, state: FSMContext):
 async def process_show_vacancy(message: Message, state: FSMContext):
     longitude: float = message.location.longitude
     latitude: float = message.location.latitude
-    result: List[DAOVacancy] = await db.get_vacancy_by_geolocation(longitude, latitude)
+    result: List[DAOVacancyData] = await db.get_vacancy_by_geolocation(longitude, latitude)
     await state.set_state(FSMCandidatePoll.show_vacancy)
     await state.update_data({"vacancy": result})
     await state.update_data({"paginator": result})
 
     vacancy_paginator: Paginator = get_vacancy_parinator_keyboard_fab(result)
     await state.update_data({"paginator": vacancy_paginator})
-    current_vacancy_data: DAOVacancy = result[0]
+    current_vacancy_data: DAOVacancyData = result[0]
     await message.answer(f"Текст вакансии: {current_vacancy_data.get('name')}\n"
                          f"Оплата: {current_vacancy_data.get('salary')}\n"
                          f"График: {current_vacancy_data.get('work_schedule')}\n",
@@ -150,8 +150,8 @@ async def process_show_vacancy(message: Message, state: FSMContext):
 async def process_vacancy_response(query: CallbackQuery, callback_data: VacancyResponse):
     id_vacancy: int = int(callback_data.id_vacancy)
     # записываем отклик в базу
-    await db.insert_or_update_vacancy_response(DAOFeedback(candidate_id=query.message.from_user.id,
-                                                           id_vacancy=id_vacancy))
+    await db.insert_or_update_vacancy_response(DAOFeedbackData(candidate_id=query.message.from_user.id,
+                                                               id_vacancy=id_vacancy))
     await query.answer("Отклик создан")
 
 

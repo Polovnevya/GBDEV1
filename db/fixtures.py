@@ -27,16 +27,14 @@ fixtures = {
     "employer": [
         {
             "user_name": "@GoodCompany",
-            "user_id": 3,
-            "chat_id": 3,
+            "tg_id": 3,
             "company_name": "хорошая компания",
             "email": "goodcompany@email.ru",
             "phone": "9333333333",
         },
         {
             "user_name": "@BadCompany",
-            "user_id": 4,
-            "chat_id": 4,
+            "tg_id": 4,
             "company_name": "плохая компания",
             "email": "badcompany@email.ru",
             "phone": "9444444444",
