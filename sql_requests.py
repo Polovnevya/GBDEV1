@@ -1,9 +1,9 @@
 # Количество откликов на вакансию
-request1 = (f'vacancies.name, COUNT(candidates.id)\n'
+request1 = (f'SELECT vacancies.name, COUNT(candidates.id)\n'
             f'FROM employers\n'
-            f'vacancies ON employers.id = vacancies.employer_id\n'
-            f'feedback ON vacancies.id = feedback.vacancy_id\n'
-            f'candidates ON feedback.candidate_id = candidates.id\n'
+            f'JOIN vacancies ON employers.id = vacancies.employer_id\n'
+            f'JOIN feedback ON vacancies.id = feedback.vacancy_id\n'
+            f'JOIN candidates ON feedback.candidate_id = candidates.id\n'
             # f'WHERE employers.tg_id = {callback.from_user.id}\n'
             # f'GROUP BY vacancies.id'
             )
