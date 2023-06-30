@@ -2,6 +2,7 @@ from typing import List
 from sqlalchemy import select
 from ..models import Vacancy
 from ..types import DAOVacancyData, WorkScheduleEnum, EmploymentEnum
+from geopy.distance import geodesic as GD
 
 
 class DAOVacancyMixin:
@@ -48,56 +49,82 @@ class DAOVacancyMixin:
         :param latitude:
         :return:
         """
+        vacancies_by_distance = []
+        await self.sql_manager.create_async_session()
+        async with self.sql_manager.async_session() as session:
+            async with session.begin():
+                stmt = select(Vacancy).where(Vacancy.deleted_at is not None)
+                vacancies = await session.scalars(stmt)
+                for vacancy in vacancies:
+                    candidate_geolocation = f"{longitude}, {latitude}"
+                    vacancy_geolocation = vacancy.geolocation
+                    distance_from_candidate_to_vacancy = GD(candidate_geolocation, vacancy_geolocation).km
+                    vacancy_data = DAOVacancyData(
+                        id=vacancy.id,
+                        employer_id=vacancy.employer_id,
+                        audience_id=vacancy.audience_id,
+                        work_schedule=vacancy.work_schedule,
+                        employment=vacancy.employment,
+                        salary=vacancy.salary,
+                        geolocation=vacancy.geolocation,
+                        is_open=vacancy.is_open,
+                        date_start=vacancy.date_start,
+                        date_end=vacancy.date_end,
+                    )
+                    vacancy_data.distance_from_candidate_to_vacancy = distance_from_candidate_to_vacancy
+                    vacancies_by_distance.append(vacancy_data)
+        vacancies_by_distance.sort(key=lambda x: x.distance_from_candidate_to_vacancy)
+        return vacancies_by_distance
         # заглушка
-        vacancy_data = [
-            {
-                "id": "1",
-                "name": "сетевой инженер",
-                "work_schedule": WorkScheduleEnum.remote.value,
-                "employment": EmploymentEnum.full_time.value,
-                "salary": 150_000.50,
-            },
-            {
-                "id": "2",
-                "name": "грузчик",
-                "work_schedule": WorkScheduleEnum.flexible.value,
-                "employment": EmploymentEnum.internship.value,
-                "salary": 15_000.75,
-            },
-            {
-                "id": "3",
-                "name": "админ",
-                "work_schedule": WorkScheduleEnum.flexible.value,
-                "employment": EmploymentEnum.internship.value,
-                "salary": 15_000.75,
-            },
-            {
-                "id": "4",
-                "name": "разраб",
-                "work_schedule": WorkScheduleEnum.flexible.value,
-                "employment": EmploymentEnum.internship.value,
-                "salary": 15_000.75,
-            },
-            {
-                "id": "5",
-                "name": "страдатель фигней",
-                "work_schedule": WorkScheduleEnum.flexible.value,
-                "employment": EmploymentEnum.internship.value,
-                "salary": 15_000.75,
-            },
-            {
-                "id": "6",
-                "name": "отпускник",
-                "work_schedule": WorkScheduleEnum.flexible.value,
-                "employment": EmploymentEnum.internship.value,
-                "salary": 15_000.75,
-            },
-            {
-                "id": "7",
-                "name": "еще грузчик",
-                "work_schedule": WorkScheduleEnum.flexible.value,
-                "employment": EmploymentEnum.internship.value,
-                "salary": 15_000.75,
-            },
-        ]
-        return vacancy_data
+        # vacancy_data = [
+        #     {
+        #         "id": "1",
+        #         "name": "сетевой инженер",
+        #         "work_schedule": WorkScheduleEnum.remote.value,
+        #         "employment": EmploymentEnum.full_time.value,
+        #         "salary": 150_000.50,
+        #     },
+        #     {
+        #         "id": "2",
+        #         "name": "грузчик",
+        #         "work_schedule": WorkScheduleEnum.flexible.value,
+        #         "employment": EmploymentEnum.internship.value,
+        #         "salary": 15_000.75,
+        #     },
+        #     {
+        #         "id": "3",
+        #         "name": "админ",
+        #         "work_schedule": WorkScheduleEnum.flexible.value,
+        #         "employment": EmploymentEnum.internship.value,
+        #         "salary": 15_000.75,
+        #     },
+        #     {
+        #         "id": "4",
+        #         "name": "разраб",
+        #         "work_schedule": WorkScheduleEnum.flexible.value,
+        #         "employment": EmploymentEnum.internship.value,
+        #         "salary": 15_000.75,
+        #     },
+        #     {
+        #         "id": "5",
+        #         "name": "страдатель фигней",
+        #         "work_schedule": WorkScheduleEnum.flexible.value,
+        #         "employment": EmploymentEnum.internship.value,
+        #         "salary": 15_000.75,
+        #     },
+        #     {
+        #         "id": "6",
+        #         "name": "отпускник",
+        #         "work_schedule": WorkScheduleEnum.flexible.value,
+        #         "employment": EmploymentEnum.internship.value,
+        #         "salary": 15_000.75,
+        #     },
+        #     {
+        #         "id": "7",
+        #         "name": "еще грузчик",
+        #         "work_schedule": WorkScheduleEnum.flexible.value,
+        #         "employment": EmploymentEnum.internship.value,
+        #         "salary": 15_000.75,
+        #     },
+        # ]
+        # return vacancy_data

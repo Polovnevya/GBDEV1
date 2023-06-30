@@ -86,7 +86,8 @@ class DAO(DAOCandidateMixin, DAOFeedbackMixin, DAOVacancyMixin, DAOEmployerData)
                         kwargs = item.__dict__
                         kwargs.pop('_sa_instance_state')
                         stmt = select(key).filter_by(**kwargs)
-                        result = await session.scalars(stmt)
-                        if not result.first():
+                        result = await session.scalar(stmt)
+
+                        if not result:
                             session.add(key(**kwargs))
                             session.commit()
