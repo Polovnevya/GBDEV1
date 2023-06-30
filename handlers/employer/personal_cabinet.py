@@ -93,24 +93,21 @@ async def process_button_2_press(callback: CallbackQuery, bot: Bot):
         request_list.append(records)
     if not os.path.exists(f"unloading/{callback.from_user.id}"):
         os.mkdir(f"unloading/{callback.from_user.id}")
-    if not os.path.exists(f'unloading/{callback.from_user.id}/reporting.txt'):
-        with open(f'unloading/{callback.from_user.id}/reporting.txt', 'w', encoding="utf-8"):
-            f.write('')
     for i in range(len(request_list)):
         with open(f'unloading/{callback.from_user.id}/reporting.txt', 'a+', encoding="utf-8") as f:
             f.write(f'{list_name_request[i]}\n')
-            for j in range(len(request_list[i])):
-                with open(f'unloading/{callback.from_user.id}/reporting.txt', 'a+', encoding="utf-8") as f:
-                    f.write(f'{request_list[i][j][0]}: {request_list[i][j][1]}\n')
-                    if j == len(request_list[i])-1:
-                        f.write(f'\n')
+        for j in range(len(request_list[i])):
+            with open(f'unloading/{callback.from_user.id}/reporting.txt', 'a+', encoding="utf-8") as f:
+                f.write(f'{request_list[i][j][0]}: {request_list[i][j][1]}\n')
+                if j == len(request_list[i])-1:
+                    f.write(f'\n')
     print(request_list)
     await callback.answer(text=f'{request_list}')
 
     document = FSInputFile(path=f'unloading/{callback.from_user.id}/reporting.txt')
     await bot.send_document(callback.message.chat.id, document=document)
-    #with open(f'unloadings/{callback.from_user.id}/reporting.txt', 'w') as f:
-        #pass
+    with open(f'unloading/{callback.from_user.id}/reporting.txt', 'w') as f:
+        pass
 
 
 @employer_pc_router.message()
