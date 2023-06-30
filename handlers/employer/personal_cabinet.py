@@ -101,9 +101,6 @@ async def process_button_2_press(callback: CallbackQuery, bot: Bot):
                 f.write(f'{request_list[i][j][0]}: {request_list[i][j][1]}\n')
                 if j == len(request_list[i])-1:
                     f.write(f'\n')
-    print(request_list)
-    await callback.answer(text=f'{request_list}')
-
     document = FSInputFile(path=f'unloading/{callback.from_user.id}/reporting.txt')
     await bot.send_document(callback.message.chat.id, document=document)
     with open(f'unloading/{callback.from_user.id}/reporting.txt', 'w') as f:
