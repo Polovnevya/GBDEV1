@@ -7,7 +7,7 @@ from ..types import DAOEmployerData
 class DAOEmployerMixin:
     sql_manager = None
 
-    async def get_active_employers_by_id(self, employer_tg_id: int) -> Union[DAOEmployerData, bool]:
+    async def get_active_employers_by_id(self, employer_tg_id: int) -> Union[DAOEmployerData, None]:
         """
         1) не удален
         :param employer_tg_id:
