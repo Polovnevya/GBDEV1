@@ -1,5 +1,5 @@
 # Количество откликов на вакансию
-my_request = (f'SELECT vacancies.name, COUNT(posts.id)\n'
+request1 = (f'SELECT vacancies.name, COUNT(posts.id)\n'
               f'FROM posts\n'
               f'JOIN vacancies ON posts.vacancy_id = vacancies.id\n'
               f'JOIN employers ON employers.id = vacancies.employer_id\n'
@@ -8,7 +8,7 @@ my_request = (f'SELECT vacancies.name, COUNT(posts.id)\n'
               )
 
 # Количество опубликованных постов с вакансией--
-my_request1 = (f'SELECT vacancies.name, COUNT(posts.id)\n'
+request2 = (f'SELECT vacancies.name, COUNT(posts.id)\n'
                f'FROM posts\n'
                f'JOIN vacancies ON posts.vacancy_id = vacancies.id\n'
                f'JOIN employers ON employers.id = vacancies.employer_id\n'
