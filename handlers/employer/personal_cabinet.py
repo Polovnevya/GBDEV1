@@ -9,6 +9,8 @@ from config.config import config
 from filters.employer import IsEmployer
 from keyboards.inline.employer import get_start_employer_keyboard, EmployerLoadCB, EmployerReportingCB
 from states.employer import FSMFormEvent
+from reporting import Reporting
+from sql_requests import request1, request2
 
 employer_pc_router: Router = Router()
 employer_pc_router.message.filter(IsEmployer(config.employers.employers_ids))
@@ -77,15 +79,38 @@ async def download_document(message: Message, bot: Bot):
 # TODO Произвести запись в базу даных
 
 
-# Этот хэндлер будет срабатывать на апдейт типа CallbackQuery
-# с data 'big_button_2_pressed'
+# Этот хэндлер будет срабатывать на отправку отчетности по размещённым вакансиям
 @employer_pc_router.callback_query(EmployerReportingCB.filter())
-async def process_button_2_press(callback: CallbackQuery, callback_data: EmployerReportingCB):
-    if callback.message.text != f'Была нажата кнопка "{callback_data.value}"':
-        await callback.message.edit_text(
-            text=f'Была нажата кнопка "{callback_data.value}"',
-            reply_markup=callback.message.reply_markup)
-    await callback.answer(text=f'Ура! Нажата кнопка "{callback_data.value}"')
+async def process_button_2_press(callback: CallbackQuery, bot: Bot):
+    request_list = []
+    list_name_request = ['Количество откликов на вакансии:',
+                         'Количество опубликованных постов с вакансией:']
+    for elm in [request1, request2]:
+        mod_request = elm + (f'WHERE employers.tg_id = {callback.from_user.id}\n'
+                             f'GROUP BY vacancies.id')
+        report = Reporting()
+        records = report.get_reporting(mod_request)
+        request_list.append(records)
+    if not os.path.exists(f"unloading/{callback.from_user.id}"):
+        os.mkdir(f"unloading/{callback.from_user.id}")
+    if not os.path.exists(f'unloading/{callback.from_user.id}/reporting.txt'):
+        with open(f'unloading/{callback.from_user.id}/reporting.txt', 'w', encoding="utf-8"):
+            f.write('')
+    for i in range(len(request_list)):
+        with open(f'unloading/{callback.from_user.id}/reporting.txt', 'a+', encoding="utf-8") as f:
+            f.write(f'{list_name_request[i]}\n')
+            for j in range(len(request_list[i])):
+                with open(f'unloading/{callback.from_user.id}/reporting.txt', 'a+', encoding="utf-8") as f:
+                    f.write(f'{request_list[i][j][0]}: {request_list[i][j][1]}\n')
+                    if j == len(request_list[i])-1:
+                        f.write(f'\n')
+    print(request_list)
+    await callback.answer(text=f'{request_list}')
+
+    document = FSInputFile(path=f'unloading/{callback.from_user.id}/reporting.txt')
+    await bot.send_document(callback.message.chat.id, document=document)
+    #with open(f'unloadings/{callback.from_user.id}/reporting.txt', 'w') as f:
+        #pass
 
 
 @employer_pc_router.message()
