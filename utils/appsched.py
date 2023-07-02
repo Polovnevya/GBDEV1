@@ -13,7 +13,7 @@ async def __send_message_2_channel(bot: Bot, vacancy: DAOVacancyData, tg_channel
                                     f"Условия {vacancy.name}\n"
                                     f"График {vacancy.work_schedule.value}\n"
                                     f"Оплата {vacancy.salary}",
-                                    reply_markup=get_url_keyboard_fab(vacancy.id))
+                                    reply_markup=await get_url_keyboard_fab(vacancy.id, bot))
     return result.message_id
 
 

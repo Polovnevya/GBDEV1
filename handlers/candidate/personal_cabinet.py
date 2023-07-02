@@ -2,9 +2,9 @@ from typing import Dict, List
 
 from aiogram import Router, F, Bot
 from aiogram.enums import ContentType
-from aiogram.filters import Command, StateFilter
+from aiogram.filters import Command, StateFilter, CommandObject
 from aiogram.fsm.context import FSMContext
-from aiogram.types import Message, CallbackQuery, ReplyKeyboardRemove
+from aiogram.types import Message, CallbackQuery, ReplyKeyboardRemove, ChatInviteLink
 
 from db.models import GenderEnum, AgeCategoriesEnum, EducationEnum
 from db.types import DAOFeedbackData, DAOVacancyData, DAOCandidateData
@@ -22,7 +22,8 @@ candidate_pc_router: Router = Router()
 
 
 @candidate_pc_router.message(Command(commands=['start']))  # , StateFilter(default_state))
-async def process_start_command(message: Message, state: FSMContext, ):
+async def process_start_command(message: Message, state: FSMContext, command: CommandObject):
+    args = command.args
     await state.clear()
     await message.answer(f"Добрый день {message.from_user.full_name}!\n"
                          f"Для создания отклика пройдите небольшой анкетирование",
@@ -142,6 +143,7 @@ async def process_show_vacancy(message: Message, state: FSMContext, bot: Bot):
     await state.update_data({"paginator": vacancy_paginator})
     current_vacancy_data: DAOVacancyData = result[0]
     a = await auto_posting(db=db, bot=bot)
+
     await message.answer(f"Текст вакансии: {current_vacancy_data.name}\n"
                          f"Оплата: {current_vacancy_data.salary}\n"
                          f"График: {current_vacancy_data.work_schedule.value}\n",
