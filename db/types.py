@@ -16,6 +16,7 @@ class DAOVacancyData:
     id: int
     employer_id: int
     audience_id: int
+    name: str
     work_schedule: str
     employment: str
     salary: float
