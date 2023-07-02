@@ -21,8 +21,9 @@ class DAOCandidateMixin:
                 stmt = select(Candidate).where(Candidate.tg_id == candidate_tg_id).where(
                     Candidate.deleted_at is not None)
                 result = await session.scalars(stmt)
-                if result.first():
-                    candidate = result.first()
+                tmp = result.first()
+                if tmp:
+                    candidate = tmp
 
                     return DAOCandidateData(first_name=candidate.first_name,
                                             middle_name=candidate.middle_name,

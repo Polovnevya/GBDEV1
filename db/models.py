@@ -2,6 +2,7 @@ from decimal import Decimal
 from typing import List
 from sqlalchemy import Enum, Float, Boolean, Table, Column
 from sqlalchemy import Integer, String, DateTime, ForeignKey
+from sqlalchemy.ext.asyncio import AsyncAttrs
 from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column, validates
 from sqlalchemy.orm import relationship
 from datetime import datetime
@@ -12,7 +13,7 @@ from validate_email import validate_email
 from db.types import GenderEnum, AgeCategoriesEnum, EducationEnum, WorkScheduleEnum, EmploymentEnum
 
 
-class Base(DeclarativeBase):
+class Base(AsyncAttrs, DeclarativeBase):
     pass
 
 
