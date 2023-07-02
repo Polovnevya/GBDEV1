@@ -57,8 +57,8 @@ fixtures = {
             "employment": EmploymentEnum.full_time,
             "salary": 150_000.50,
             "geolocation": "69.347654, 88.207752",
-            "date_start": datetime.now(),
-            "date_end": datetime.now() + timedelta(days=1),
+            "date_start": datetime(2023, 7, 2, 18, 42, 13, 933058),
+            "date_end": datetime(2023, 7, 4, 18, 42, 13, 933058),
         },
         {
             "name": "грузчик",
@@ -68,8 +68,8 @@ fixtures = {
             "employment": EmploymentEnum.internship,
             "salary": 15_000.75,
             "geolocation": "69.348269, 88.212360",
-            "date_start": datetime.now(),
-            "date_end": datetime.now() + timedelta(days=2),
+            "date_start": datetime(2023, 7, 2, 18, 42, 13, 933058),
+            "date_end": datetime(2023, 7, 4, 18, 42, 13, 933058),
         },
     ],
     "feedback": [
