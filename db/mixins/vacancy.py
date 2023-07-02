@@ -3,6 +3,7 @@ from sqlalchemy import select
 from ..models import Vacancy
 from ..types import DAOVacancyData, WorkScheduleEnum, EmploymentEnum
 from geopy.distance import geodesic as GD
+from operator import attrgetter
 
 
 class DAOVacancyMixin:
@@ -37,7 +38,7 @@ class DAOVacancyMixin:
                         date_end=vacancy.date_end
                     )
 
-    async def get_vacancy_by_geolocation(self, longitude: float, latitude: float) -> List[DAOVacancyData]:
+    async def get_vacancy_by_geolocation(self, longitude: float = None, latitude: float = None) -> List[DAOVacancyData]:
         """
         возвращает список вакансий, по широте и долготе
         в определенном радиусе (можно в конфиг пробросить и вытаскивать потом из него)
@@ -49,16 +50,14 @@ class DAOVacancyMixin:
         :param latitude:
         :return:
         """
-        vacancies_by_distance = []
+        vacancies_list = []
         await self.sql_manager.create_async_session()
         async with self.sql_manager.async_session() as session:
             async with session.begin():
                 stmt = select(Vacancy).where(Vacancy.deleted_at is not None)
                 vacancies = await session.scalars(stmt)
+
                 for vacancy in vacancies:
-                    candidate_geolocation = f"{longitude}, {latitude}"
-                    vacancy_geolocation = vacancy.geolocation
-                    distance_from_candidate_to_vacancy = GD(candidate_geolocation, vacancy_geolocation).km
                     vacancy_data = DAOVacancyData(
                         id=vacancy.id,
                         employer_id=vacancy.employer_id,
@@ -72,10 +71,18 @@ class DAOVacancyMixin:
                         date_start=vacancy.date_start,
                         date_end=vacancy.date_end,
                     )
-                    vacancy_data.distance_from_candidate_to_vacancy = distance_from_candidate_to_vacancy
-                    vacancies_by_distance.append(vacancy_data)
-        vacancies_by_distance.sort(key=lambda x: x.distance_from_candidate_to_vacancy)
-        return vacancies_by_distance
+
+                    if longitude and latitude:
+                        candidate_geolocation = f"{longitude}, {latitude}"
+                        vacancy_geolocation = vacancy.geolocation
+                        distance_from_candidate_to_vacancy = GD(candidate_geolocation, vacancy_geolocation).km
+                        vacancy_data.distance_from_candidate_to_vacancy = distance_from_candidate_to_vacancy
+                    vacancies_list.append(vacancy_data)
+
+        if longitude and latitude:
+            vacancies_list = sorted(vacancies_list, key=attrgetter("distance_from_candidate_to_vacancy"))
+
+        return vacancies_list
         # заглушка
         # vacancy_data = [
         #     {

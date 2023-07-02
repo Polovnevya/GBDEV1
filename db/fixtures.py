@@ -71,6 +71,17 @@ fixtures = {
             "date_start": datetime(2023, 7, 2, 18, 42, 13, 933058),
             "date_end": datetime(2023, 7, 4, 18, 42, 13, 933058),
         },
+        {
+            "name": "пинатель хуёв",
+            "employer_id": 2,
+            "audience_id": 2,
+            "work_schedule": WorkScheduleEnum.flexible,
+            "employment": EmploymentEnum.internship,
+            "salary": 15_000.75,
+            "geolocation": "69.346666, 88.211111",
+            "date_start": datetime(2023, 7, 2, 18, 42, 13, 933058),
+            "date_end": datetime(2023, 7, 4, 18, 42, 13, 933058),
+        },
     ],
     "feedback": [
         {
