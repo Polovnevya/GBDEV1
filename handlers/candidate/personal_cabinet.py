@@ -23,8 +23,11 @@ candidate_pc_router: Router = Router()
 
 @candidate_pc_router.message(Command(commands=['start']))  # , StateFilter(default_state))
 async def process_start_command(message: Message, state: FSMContext, command: CommandObject):
-    args = command.args
     await state.clear()
+    args = command.args
+    if args:
+        await state.update_data({"vacancy_id": args})
+
     await message.answer(f"Добрый день {message.from_user.full_name}!\n"
                          f"Для создания отклика пройдите небольшой анкетирование",
                          reply_markup=ReplyKeyboardRemove())
@@ -135,6 +138,13 @@ async def process_show_vacancy(message: Message, state: FSMContext, bot: Bot):
     longitude: float = message.location.longitude
     latitude: float = message.location.latitude
     result: List[DAOVacancyData] = await db.get_vacancy_by_geolocation(longitude, latitude)
+
+    data = await state.get_data()
+    vacancy_id_response = data.get("vacancy_id")
+    if vacancy_id_response:
+        vacancy: DAOVacancyData = await db.get_vacancy_by_id(int(vacancy_id_response))
+        result.append(vacancy)
+
     await state.set_state(FSMCandidatePoll.show_vacancy)
     await state.update_data({"vacancy": result})
     await state.update_data({"paginator": result})

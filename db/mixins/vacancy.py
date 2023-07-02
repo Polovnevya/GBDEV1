@@ -23,12 +23,13 @@ class DAOVacancyMixin:
                 result = await session.scalars(stmt)
                 tmp = result.first()
                 if tmp:
-                    vacancy = result.first()
+                    vacancy = tmp
 
                     return DAOVacancyData(
                         id=vacancy.id,
                         employer_id=vacancy.employer_id,
                         audience_id=vacancy.audience_id,
+                        name=vacancy.name,
                         work_schedule=vacancy.work_schedule,
                         employment=vacancy.employment,
                         salary=vacancy.salary,
