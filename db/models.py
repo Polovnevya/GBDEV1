@@ -1,7 +1,7 @@
 from decimal import Decimal
 from typing import List
 from sqlalchemy import Enum, Float, Boolean, Table, Column
-from sqlalchemy import Integer, String, DateTime, ForeignKey
+from sqlalchemy import Integer, String, DateTime, ForeignKey, BigInteger
 from sqlalchemy.ext.asyncio import AsyncAttrs
 from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column, validates
 from sqlalchemy.orm import relationship
@@ -143,7 +143,7 @@ class Channel(Base, DateBaseModel):
 
     id: Mapped[int] = mapped_column(Integer, primary_key=True)
     name: Mapped[str] = mapped_column(String, nullable=False)
-    channel_id: Mapped[int] = mapped_column(unique=True, nullable=False)
+    channel_id: Mapped[int] = mapped_column(BigInteger, unique=True, nullable=False)
     audience: Mapped[List[Audience]] = relationship(secondary=channel_to_audience)
 
     # def __repr__(self):
