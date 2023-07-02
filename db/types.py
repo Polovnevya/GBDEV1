@@ -27,7 +27,6 @@ class DAOVacancyData:
 
 @dataclass
 class DAOCandidateData:
-    id: int
     first_name: str
     middle_name: str
     last_name: str
@@ -36,6 +35,7 @@ class DAOCandidateData:
     education: str
     phone: str
     tg_id: str
+    id: int = None
 
 
 @dataclass

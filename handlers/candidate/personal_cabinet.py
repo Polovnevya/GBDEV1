@@ -16,7 +16,7 @@ from keyboards.inline.vacancy_paginator import Paginator, Navigation, \
     VacancyResponse, get_vacancy_paginator_keyboard_fab
 from loader import db
 from states.candidate import FSMCandidatePoll
-from utils.appsched import send_message_2_channel
+from utils.appsched import auto_posting
 
 candidate_pc_router: Router = Router()
 
@@ -141,7 +141,7 @@ async def process_show_vacancy(message: Message, state: FSMContext, bot: Bot):
     vacancy_paginator: Paginator = get_vacancy_paginator_keyboard_fab(result)
     await state.update_data({"paginator": vacancy_paginator})
     current_vacancy_data: DAOVacancyData = result[0]
-    a =await send_message_2_channel(bot=bot, vacancy=current_vacancy_data)
+    a = await auto_posting(db=db, bot=bot)
     await message.answer(f"Текст вакансии: {current_vacancy_data.name}\n"
                          f"Оплата: {current_vacancy_data.salary}\n"
                          f"График: {current_vacancy_data.work_schedule.value}\n",
