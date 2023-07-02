@@ -1,9 +1,10 @@
 import typing
 
-from aiogram.types import InlineKeyboardMarkup, InlineKeyboardButton
 from aiogram.filters.callback_data import CallbackData
-
+from aiogram.types import InlineKeyboardMarkup, InlineKeyboardButton
 from aiogram.utils.keyboard import InlineKeyboardBuilder
+
+from db.types import DAOVacancyData
 
 
 class Navigation(CallbackData, prefix="PG"):
@@ -14,13 +15,13 @@ class VacancyResponse(CallbackData, prefix="VR"):
     id_vacancy: str
 
 
-def get_vacancy_parinator_keyboard_fab(vacancy_data):
+def get_vacancy_paginator_keyboard_fab(vacancy_data: typing.List[DAOVacancyData]):
     builder = InlineKeyboardBuilder()
-    vacancy: typing.Dict
+    vacancy: DAOVacancyData
     for vacancy in vacancy_data:
         builder.button(
             text="Откликнуться на вакансию",
-            callback_data=VacancyResponse(id_vacancy=vacancy.get("id"))
+            callback_data=VacancyResponse(id_vacancy=vacancy.id)
         )
         builder.adjust(1)
 

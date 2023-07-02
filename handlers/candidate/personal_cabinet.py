@@ -5,14 +5,15 @@ from aiogram.enums import ContentType
 from aiogram.filters import Command, StateFilter
 from aiogram.fsm.context import FSMContext
 from aiogram.types import Message, CallbackQuery, ReplyKeyboardRemove
-from db.models import GenderEnum, AgeCategoriesEnum, EducationEnum, Feedback
+
+from db.models import GenderEnum, AgeCategoriesEnum, EducationEnum
 from db.types import DAOFeedbackData, DAOVacancyData, DAOCandidateData
 from keyboards.candidate import kb_contact, kb_geo
 from keyboards.inline.candidate import (
     get_gender_keyboard_fab, GenderCallback, AgeCallback, get_age_keyboard_fab,
     EducationCallback, get_education_keyboard_fab, get_personal_data_keyboard, PersonalData, )
-from keyboards.inline.vacancy_paginator import get_vacancy_parinator_keyboard_fab, Paginator, Navigation, \
-    VacancyResponse
+from keyboards.inline.vacancy_paginator import Paginator, Navigation, \
+    VacancyResponse, get_vacancy_paginator_keyboard_fab
 from loader import db
 from states.candidate import FSMCandidatePoll
 
@@ -26,19 +27,19 @@ async def process_start_command(message: Message, state: FSMContext, ):
                          f"Для создания отклика пройдите небольшой анкетирование",
                          reply_markup=ReplyKeyboardRemove())
 
-    result = await db.get_candidate_by_id(message.from_user.id)
+    result: DAOCandidateData = await db.get_candidate_by_id(message.from_user.id)
     if not result:
         await message.answer(f"Введите Ваше имя")
         await state.set_state(FSMCandidatePoll.first_name)
     else:
         await message.answer(f"Это корректные данные?\n"
-                             f"Имя: {result.get('first_name')} \n"
-                             f"Отчество: {result.get('middle_name')} \n"
-                             f"Фамилия: {result.get('last_name')} \n"
-                             f"Пол: {result.get('gender')} \n"
-                             f"Возраст: {result.get('age')} \n"
-                             f"Образование: {result.get('education')} \n"
-                             f"Телефон: {result.get('phone')}",
+                             f"Имя: {result.first_name} \n"
+                             f"Отчество: {result.middle_name} \n"
+                             f"Фамилия: {result.last_name} \n"
+                             f"Пол: {result.gender} \n"
+                             f"Возраст: {result.age} \n"
+                             f"Образование: {result.education} \n"
+                             f"Телефон: {result.phone}",
                              reply_markup=get_personal_data_keyboard())
         await state.set_state(FSMCandidatePoll.load_pd)
 
@@ -136,12 +137,12 @@ async def process_show_vacancy(message: Message, state: FSMContext):
     await state.update_data({"vacancy": result})
     await state.update_data({"paginator": result})
 
-    vacancy_paginator: Paginator = get_vacancy_parinator_keyboard_fab(result)
+    vacancy_paginator: Paginator = get_vacancy_paginator_keyboard_fab(result)
     await state.update_data({"paginator": vacancy_paginator})
     current_vacancy_data: DAOVacancyData = result[0]
-    await message.answer(f"Текст вакансии: {current_vacancy_data.get('name')}\n"
-                         f"Оплата: {current_vacancy_data.get('salary')}\n"
-                         f"График: {current_vacancy_data.get('work_schedule')}\n",
+    await message.answer(f"Текст вакансии: {current_vacancy_data.name}\n"
+                         f"Оплата: {current_vacancy_data.salary}\n"
+                         f"График: {current_vacancy_data.work_schedule}\n",
                          reply_markup=await vacancy_paginator.update_kb())
 
 
