@@ -11,7 +11,7 @@ async def main():
     # Создает таблицы в бд
     await db.delete_db_tables(is_delete=False)
     await db.create_db_tables()
-    # await db.load_fixtures(fixtures)
+    await db.load_fixtures(fixtures)
 
     # Конфигурируем логирование
     logging.basicConfig(
