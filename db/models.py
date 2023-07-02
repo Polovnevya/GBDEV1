@@ -109,6 +109,7 @@ class Vacancy(Base, DateBaseModel):
     date_start: Mapped[datetime] = mapped_column(DateTime)
     date_end: Mapped[datetime] = mapped_column(DateTime)
 
+
     # def __repr__(self):
     #     return f"<id: {self.id}, vacancy_name: {self.name}, employer_id: {self.employer_id}, " \
     #            f"audience_id: {self.audience_id}, work_schedule: {self.work_schedule}, salary: {self.salary}, " \

@@ -20,7 +20,8 @@ class DAOVacancyMixin:
                 stmt = select(Vacancy).where(Vacancy.id == vacancy_id).where(
                     Vacancy.deleted_at is not None)
                 result = await session.scalars(stmt)
-                if result.first():
+                tmp = result.first()
+                if tmp:
                     vacancy = result.first()
 
                     return DAOVacancyData(
@@ -36,7 +37,6 @@ class DAOVacancyMixin:
                         date_end=vacancy.date_end
                     )
 
-    # TODO запилить реализацию
     async def get_vacancy_by_geolocation(self, longitude: float, latitude: float) -> List[DAOVacancyData]:
         """
         возвращает список вакансий, по широте и долготе
