@@ -17,7 +17,7 @@ async def __send_message_2_channel(bot: Bot, vacancy: DAOVacancyData, tg_channel
     return result.message_id
 
 
-async def auto_posting(db: DAO, bot: Bot):
+async def auto_posting(bot: Bot, db: DAO):
     vacancies = await db.get_vacancy_by_geolocation()
     for vacancy in vacancies:
         channels = await db.get_channels_id_by_audience(vacancy.audience_id)
