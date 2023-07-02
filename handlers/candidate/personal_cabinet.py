@@ -142,7 +142,7 @@ async def process_show_vacancy(message: Message, state: FSMContext):
     current_vacancy_data: DAOVacancyData = result[0]
     await message.answer(f"Текст вакансии: {current_vacancy_data.name}\n"
                          f"Оплата: {current_vacancy_data.salary}\n"
-                         f"График: {current_vacancy_data.work_schedule}\n",
+                         f"График: {current_vacancy_data.work_schedule.value}\n",
                          reply_markup=await vacancy_paginator.update_kb())
 
 
@@ -151,9 +151,10 @@ async def process_show_vacancy(message: Message, state: FSMContext):
 async def process_vacancy_response(query: CallbackQuery, callback_data: VacancyResponse):
     id_vacancy: int = int(callback_data.id_vacancy)
     # записываем отклик в базу
-    await db.insert_or_update_vacancy_response(DAOFeedbackData(candidate_id=query.message.from_user.id,
-                                                               id_vacancy=id_vacancy))
+    await db.insert_or_update_vacancy_response(DAOFeedbackData(candidate_id=query.from_user.id,
+                                                               vacancy_id=id_vacancy))
     await query.answer("Отклик создан")
+    await query.message.answer("Отклик создан")
 
 
 #
@@ -165,9 +166,9 @@ async def process_forward_show_vacancy(query: CallbackQuery, state: FSMContext):
     await vacancy_paginator.on_next()
     await state.update_data({"paginator": vacancy_paginator})
     current_vacancy_data: Dict = result.get("vacancy")[vacancy_paginator.page]
-    await query.message.edit_text(f"Текст вакансии: {current_vacancy_data.get('name')}\n"
-                                  f"Оплата: {current_vacancy_data.get('salary')}\n"
-                                  f"График: {current_vacancy_data.get('work_schedule')}\n",
+    await query.message.edit_text(f"Текст вакансии: {current_vacancy_data.name}\n"
+                                  f"Оплата: {current_vacancy_data.salary}\n"
+                                  f"График: {current_vacancy_data.work_schedule.value}\n",
                                   reply_markup=await vacancy_paginator.update_kb())
 
 
@@ -179,9 +180,9 @@ async def process_backward_show_vacancy(query: CallbackQuery, state: FSMContext)
     await vacancy_paginator.on_prev()
     await state.update_data({"paginator": vacancy_paginator})
     current_vacancy_data: Dict = result.get("vacancy")[vacancy_paginator.page]
-    await query.message.edit_text(f"Текст вакансии: {current_vacancy_data.get('name')}\n"
-                                  f"Оплата: {current_vacancy_data.get('salary')}\n"
-                                  f"График: {current_vacancy_data.get('work_schedule')}\n",
+    await query.message.edit_text(f"Текст вакансии: {current_vacancy_data.name}\n"
+                                  f"Оплата: {current_vacancy_data.salary}\n"
+                                  f"График: {current_vacancy_data.work_schedule.value}\n",
                                   reply_markup=await vacancy_paginator.update_kb())
 
 
