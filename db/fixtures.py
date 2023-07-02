@@ -84,12 +84,12 @@ fixtures = {
     ],
     "channel": [
         {
-            "name": "IT вакансии",
-            "channel_id": 1,
+            "name": "IT вакансии 1",
+            "channel_id": -1001753724398,
         },
         {
             "name": "неквалифицированные вакансии",
-            "channel_id": 2,
+            "channel_id": -1001829933123,
         },
     ],
     "channel_by_audiences": [

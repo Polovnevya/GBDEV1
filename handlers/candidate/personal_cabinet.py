@@ -155,6 +155,7 @@ async def process_vacancy_response(query: CallbackQuery, callback_data: VacancyR
     await db.insert_or_update_vacancy_response(DAOFeedbackData(candidate_id=result.id,
                                                                vacancy_id=id_vacancy))
     await query.answer("Отклик создан")
+    #TODO добавить описание вакансии
     await query.message.answer("Отклик создан")
 
 
