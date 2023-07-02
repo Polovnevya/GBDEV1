@@ -63,3 +63,10 @@ class DAOCandidateMixin:
                     candidate.phone = candidate_data.phone
                     candidate.gender = candidate_data.gender
                     session.commit()
+
+    # TODO конвертер tg_id -> candidate.id
+    @staticmethod
+    async def get_candidate_id_by_tguser_id(fg_id: int):
+        candidate_id = fg_id
+        candidate_id = 3
+        return candidate_id

@@ -1,6 +1,6 @@
 from typing import Dict, List
 
-from aiogram import Router, F
+from aiogram import Router, F, Bot
 from aiogram.enums import ContentType
 from aiogram.filters import Command, StateFilter
 from aiogram.fsm.context import FSMContext
@@ -16,6 +16,7 @@ from keyboards.inline.vacancy_paginator import Paginator, Navigation, \
     VacancyResponse, get_vacancy_paginator_keyboard_fab
 from loader import db
 from states.candidate import FSMCandidatePoll
+from utils.appsched import send_message_2_channel
 
 candidate_pc_router: Router = Router()
 
@@ -129,7 +130,7 @@ async def process_get_phone(message: Message, state: FSMContext):
 
 
 @candidate_pc_router.message(StateFilter(FSMCandidatePoll.geolocation), F.content_type.in_({ContentType.LOCATION}))
-async def process_show_vacancy(message: Message, state: FSMContext):
+async def process_show_vacancy(message: Message, state: FSMContext, bot: Bot):
     longitude: float = message.location.longitude
     latitude: float = message.location.latitude
     result: List[DAOVacancyData] = await db.get_vacancy_by_geolocation(longitude, latitude)
@@ -140,6 +141,7 @@ async def process_show_vacancy(message: Message, state: FSMContext):
     vacancy_paginator: Paginator = get_vacancy_paginator_keyboard_fab(result)
     await state.update_data({"paginator": vacancy_paginator})
     current_vacancy_data: DAOVacancyData = result[0]
+    a =await send_message_2_channel(bot=bot, vacancy=current_vacancy_data)
     await message.answer(f"Текст вакансии: {current_vacancy_data.name}\n"
                          f"Оплата: {current_vacancy_data.salary}\n"
                          f"График: {current_vacancy_data.work_schedule.value}\n",
@@ -155,7 +157,7 @@ async def process_vacancy_response(query: CallbackQuery, callback_data: VacancyR
     await db.insert_or_update_vacancy_response(DAOFeedbackData(candidate_id=result.id,
                                                                vacancy_id=id_vacancy))
     await query.answer("Отклик создан")
-    #TODO добавить описание вакансии
+    # TODO добавить описание вакансии
     await query.message.answer("Отклик создан")
 
 
