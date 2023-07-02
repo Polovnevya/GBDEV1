@@ -17,7 +17,7 @@ class DAOFeedbackMixin:
                 tmp = result.first()
                 if not tmp:
                     session.add(Feedback(**vacancy_response.__dict__))
-                    session.commit()
+                    await session.commit()
                 else:
                     feedback = tmp
                     feedback.vacancy_id = vacancy_response.vacancy_id

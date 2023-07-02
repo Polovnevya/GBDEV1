@@ -25,7 +25,8 @@ class DAOCandidateMixin:
                 if tmp:
                     candidate = tmp
 
-                    return DAOCandidateData(first_name=candidate.first_name,
+                    return DAOCandidateData(id=candidate.id,
+                                            first_name=candidate.first_name,
                                             middle_name=candidate.middle_name,
                                             last_name=candidate.last_name,
                                             gender=candidate.gender.value,

@@ -151,7 +151,8 @@ async def process_show_vacancy(message: Message, state: FSMContext):
 async def process_vacancy_response(query: CallbackQuery, callback_data: VacancyResponse):
     id_vacancy: int = int(callback_data.id_vacancy)
     # записываем отклик в базу
-    await db.insert_or_update_vacancy_response(DAOFeedbackData(candidate_id=query.from_user.id,
+    result: DAOCandidateData = await db.get_candidate_by_id(query.from_user.id)
+    await db.insert_or_update_vacancy_response(DAOFeedbackData(candidate_id=result.id,
                                                                vacancy_id=id_vacancy))
     await query.answer("Отклик создан")
     await query.message.answer("Отклик создан")
