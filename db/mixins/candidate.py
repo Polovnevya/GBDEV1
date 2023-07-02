@@ -50,7 +50,7 @@ class DAOCandidateMixin:
                 stmt = select(Candidate).where(Candidate.tg_id == candidate_data.tg_id)
                 result = await session.scalars(stmt)
                 tmp = result.first()
-                if tmp:
+                if not tmp:
                     session.add(Candidate(**candidate_data.__dict__))
                     session.commit()
                 else:
