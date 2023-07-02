@@ -49,11 +49,12 @@ class DAOCandidateMixin:
             async with session.begin():
                 stmt = select(Candidate).where(Candidate.tg_id == candidate_data.tg_id)
                 result = await session.scalars(stmt)
-                if not result.first():
+                tmp = result.first()
+                if tmp:
                     session.add(Candidate(**candidate_data.__dict__))
                     session.commit()
                 else:
-                    candidate = result.first()
+                    candidate = tmp
                     candidate.first_name = candidate_data.first_name
                     candidate.middle_name = candidate_data.middle_name
                     candidate.education = candidate_data.education

@@ -19,8 +19,9 @@ class DAOEmployerMixin:
                 stmt = select(Employer).where(Employer.tg_id == employer_tg_id).where(
                     Employer.deleted_at is not None)
                 result = await session.scalars(stmt)
-                if result.first():
-                    employer = result.first()
+                tmp = result.first()
+                if tmp:
+                    employer = tmp
                     return DAOEmployerData(
                         company_name=employer.company_name,
                         email=employer.email,
