@@ -116,8 +116,8 @@ async def process_button_2_press(callback: CallbackQuery,
         with open(f'{path_file_to_reporting}/reporting.csv', 'a+', encoding="utf-8") as f:
             f.write(f'{",".join(map(str, list_name_request[i]))}\n')
     df = pd.read_csv(f'{path_file_to_reporting}/reporting.csv')
-    df.to_excel(f'{path_file_to_reporting}/output.xlsx', engine='openpyxl')
-    document = FSInputFile(path=f'{path_file_to_reporting}/output.xlsx')
+    df.to_excel(f'{path_file_to_reporting}/Отчёт.xlsx', engine='openpyxl')
+    document = FSInputFile(path=f'{path_file_to_reporting}/Отчёт.xlsx')
     await callback.message.answer(text='Отчет сформирован.')
     await bot.send_document(callback.message.chat.id, document=document)
     with open(f'{path_file_to_reporting}/reporting.csv', 'w') as f:
