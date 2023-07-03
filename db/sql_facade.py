@@ -10,6 +10,7 @@ from .mixins.emloyer import DAOEmployerData
 from .mixins.channel import DAOChannelMixin
 from .mixins.post import DAOPostMixin
 
+
 class SqlManager:
     def __init__(self, config: Config):
         self.async_engine = None
@@ -104,4 +105,3 @@ class DAO(DAOCandidateMixin, DAOFeedbackMixin, DAOVacancyMixin, DAOEmployerData,
                 if audience1 not in channel2.audience:
                     channel2.audience.append(audience1)
                 session.commit()
-

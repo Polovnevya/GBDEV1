@@ -76,6 +76,7 @@ class DAOVacancyMixin:
                         vacancy_geolocation = vacancy.geolocation
                         distance_from_candidate_to_vacancy = GD(candidate_geolocation, vacancy_geolocation).km
                         vacancy_data.distance_from_candidate_to_vacancy = distance_from_candidate_to_vacancy
+                    vacancy_data.id = vacancy.id
                     vacancies_list.append(vacancy_data)
 
         if longitude and latitude:
