@@ -40,11 +40,11 @@ async def process_button_load_press(callback: CallbackQuery, state: FSMContext, 
 @employer_pc_router.message(F.content_type == ContentType.DOCUMENT,
                             StateFilter(FSMFormEvent.lreporting))
 async def download_document(message: Message, bot: Bot):
-    if not os.path.exists(f"downloads/{message.from_user.id}"):
-        os.mkdir(f"downloads/{message.from_user.id}")
-    if not os.path.exists(f"downloads/{message.from_user.id}/{message.date.strftime('%Y-%m-%d')}"):
-        os.mkdir(f"downloads/{message.from_user.id}/{message.date.strftime('%Y-%m-%d')}")
-    name_form = f"downloads/{message.from_user.id}/{message.date.strftime('%Y-%m-%d')}/{message.document.file_id}"
+    if not os.path.exists(f"files/downloads/{message.from_user.id}"):
+        os.mkdir(f"files/downloads/{message.from_user.id}")
+    if not os.path.exists(f"files/downloads/{message.from_user.id}/{message.date.strftime('%Y-%m-%d')}"):
+        os.mkdir(f"files/downloads/{message.from_user.id}/{message.date.strftime('%Y-%m-%d')}")
+    name_form = f"files/downloads/{message.from_user.id}/{message.date.strftime('%Y-%m-%d')}/{message.document.file_id}"
     await bot.download(
         message.document,
         destination=f'{name_form}.xlsx')
@@ -91,7 +91,7 @@ async def process_button_2_press(callback: CallbackQuery, bot: Bot):
         report = Reporting()
         records = report.get_reporting(mod_request)
         request_list.append(records)
-        path_file_to_reporting = f'files/work/common/unloading/{callback.from_user.id}'
+        path_file_to_reporting = f'files/work/unloading/{callback.from_user.id}'
     if not os.path.exists(path_file_to_reporting):
         os.mkdir(path_file_to_reporting)
     for i in range(len(request_list)):
