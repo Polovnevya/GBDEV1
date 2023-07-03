@@ -91,19 +91,20 @@ async def process_button_2_press(callback: CallbackQuery, bot: Bot):
         report = Reporting()
         records = report.get_reporting(mod_request)
         request_list.append(records)
-    if not os.path.exists(f"unloading/{callback.from_user.id}"):
-        os.mkdir(f"files/unloading/{callback.from_user.id}")
+        path_file_to_reporting = f'files/work/common/unloading/{callback.from_user.id}'
+    if not os.path.exists(path_file_to_reporting):
+        os.mkdir(path_file_to_reporting)
     for i in range(len(request_list)):
-        with open(f'files/unloading/{callback.from_user.id}/reporting.txt', 'a+', encoding="utf-8") as f:
+        with open(f'{path_file_to_reporting}/reporting.txt', 'a+', encoding="utf-8") as f:
             f.write(f'{list_name_request[i]}\n')
         for j in range(len(request_list[i])):
-            with open(f'files/unloading/{callback.from_user.id}/reporting.txt', 'a+', encoding="utf-8") as f:
+            with open(f'{path_file_to_reporting}/reporting.txt', 'a+', encoding="utf-8") as f:
                 f.write(f'{request_list[i][j][0]}: {request_list[i][j][1]}\n')
                 if j == len(request_list[i])-1:
                     f.write(f'\n')
-    document = FSInputFile(path=f'files/unloading/{callback.from_user.id}/reporting.txt')
+    document = FSInputFile(path=f'{path_file_to_reporting}/reporting.txt')
     await bot.send_document(callback.message.chat.id, document=document)
-    with open(f'files/unloading/{callback.from_user.id}/reporting.txt', 'w') as f:
+    with open(f'{path_file_to_reporting}/reporting.txt', 'w') as f:
         pass
 
 
