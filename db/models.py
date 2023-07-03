@@ -42,7 +42,7 @@ class Candidate(Base, DateBaseModel):
     __tablename__ = "candidates"
 
     id: Mapped[int] = mapped_column(primary_key=True)
-    feedback: Mapped[List["Feedback"]] = relationship()
+    feedback: Mapped[List["Feedback"]] = relationship(lazy="joined")
     tg_id: Mapped[int] = mapped_column(unique=True, nullable=False)
     first_name: Mapped[str] = mapped_column(String(50), nullable=False)
     middle_name: Mapped[str] = mapped_column(String(50), nullable=True)
@@ -69,7 +69,7 @@ class Audience(Base, DateBaseModel):
 
     id: Mapped[int] = mapped_column(primary_key=True)
     name: Mapped[str] = mapped_column(String, nullable=False)
-    vacancy: Mapped[List["Vacancy"]] = relationship()
+    vacancy: Mapped[List["Vacancy"]] = relationship(lazy="joined")
 
     # def __repr__(self):
     #     return f"<id: {self.id}, name: {self.name},  " \
@@ -80,7 +80,7 @@ class Employer(Base, ContactBaseModel, DateBaseModel):
     __tablename__ = "employers"
 
     id: Mapped[int] = mapped_column(primary_key=True)
-    vacancy: Mapped[List["Vacancy"]] = relationship()
+    vacancy: Mapped[List["Vacancy"]] = relationship(lazy="joined")
     user_name: Mapped[str] = mapped_column(String(50), unique=True, nullable=False)
     tg_id: Mapped[int] = mapped_column(unique=True, nullable=False)
     company_name = mapped_column(String(50), nullable=False)
@@ -96,8 +96,8 @@ class Vacancy(Base, DateBaseModel):
     __tablename__ = "vacancies"
 
     id: Mapped[int] = mapped_column(Integer, primary_key=True)
-    feedback: Mapped[List["Feedback"]] = relationship()
-    post: Mapped[List["Post"]] = relationship()
+    feedback: Mapped[List["Feedback"]] = relationship(lazy="joined")
+    post: Mapped[List["Post"]] = relationship(lazy="joined")
     name: Mapped[str] = mapped_column(String, nullable=False)
     employer_id: Mapped[int] = mapped_column(ForeignKey("employers.id"), nullable=False)
     audience_id: Mapped[int] = mapped_column(ForeignKey("audiences.id"), nullable=False)
@@ -144,7 +144,7 @@ class Channel(Base, DateBaseModel):
     id: Mapped[int] = mapped_column(Integer, primary_key=True)
     name: Mapped[str] = mapped_column(String, nullable=False)
     channel_id: Mapped[int] = mapped_column(BigInteger, unique=True, nullable=False)
-    audience: Mapped[List[Audience]] = relationship(secondary=channel_to_audience)
+    audience: Mapped[List[Audience]] = relationship(secondary=channel_to_audience, lazy="joined")
 
     # def __repr__(self):
     #     return f"<id: {self.id}, name: {self.name}, channel_id: {self.channel_id}, audience: {self.audience}, " \

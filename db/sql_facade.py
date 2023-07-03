@@ -1,14 +1,14 @@
 from typing import List
-
 from sqlalchemy import inspect, select
 from sqlalchemy.ext.asyncio import create_async_engine, async_sessionmaker, engine
-from .models import Base, Candidate, Employer, Audience, Vacancy, Feedback, Post, Channel
+from .models import Base, Candidate, Employer, Audience, Vacancy, Feedback, Post, Channel, channel_to_audience
 from config.config import Config
 from .mixins.candidate import DAOCandidateMixin
 from .mixins.vacancy import DAOVacancyMixin
 from .mixins.feedback import DAOFeedbackMixin
 from .mixins.emloyer import DAOEmployerData
-
+from .mixins.channel import DAOChannelMixin
+from .mixins.post import DAOPostMixin
 
 class SqlManager:
     def __init__(self, config: Config):
@@ -46,7 +46,7 @@ class SqlManager:
         self.async_connection = self.async_engine.connect()
 
 
-class DAO(DAOCandidateMixin, DAOFeedbackMixin, DAOVacancyMixin, DAOEmployerData):
+class DAO(DAOCandidateMixin, DAOFeedbackMixin, DAOVacancyMixin, DAOEmployerData, DAOChannelMixin, DAOPostMixin):
     def __init__(self, sql_manager: SqlManager):
         self.sql_manager = sql_manager
 
@@ -94,10 +94,14 @@ class DAO(DAOCandidateMixin, DAOFeedbackMixin, DAOVacancyMixin, DAOEmployerData)
                             session.add(key(**kwargs))
                             session.commit()
 
-    # TODO запилить реализацию или вынести в миксин - добавление поста. принимает ид тг канала, ид сообщения и ид вакансии
-    async def insert_post(self, channel_id: int, message_id: int, vacancy_id: int):
-        pass
+                channel1 = await session.scalar(select(Channel).filter_by(id=1))
+                channel2 = await session.scalar(select(Channel).filter_by(id=2))
+                audience1 = await session.scalar(select(Audience).filter_by(id=1))
+                audience2 = await session.scalar(select(Audience).filter_by(id=2))
+                if audience1 not in channel1.audience and audience2 not in channel1.audience:
+                    channel1.audience.append(audience1)
+                    channel1.audience.append(audience2)
+                if audience1 not in channel2.audience:
+                    channel2.audience.append(audience1)
+                session.commit()
 
-    # TODO запилить реализацию или вынести в миксин. Возвращает список не удаленных id тг каналов, в зависимости от аудитории
-    async def get_channels_id_by_audience(self, audience_id: int) -> List[int]:
-        return [-1001753724398, -1001829933123]

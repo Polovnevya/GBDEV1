@@ -64,9 +64,9 @@ class DAOCandidateMixin:
                     candidate.gender = candidate_data.gender
                     session.commit()
 
-    # TODO конвертер tg_id -> candidate.id
-    @staticmethod
-    async def get_candidate_id_by_tguser_id(fg_id: int):
-        candidate_id = fg_id
-        candidate_id = 3
-        return candidate_id
+    async def get_candidate_id_by_tguser_id(self, tg_id: int) -> int:
+        await self.sql_manager.create_async_session()
+        async with self.sql_manager.async_session() as session:
+            async with session.begin():
+                candidate = await session.scalar(select(Candidate).filter_by(tg_id=tg_id))
+        return candidate.id

@@ -103,7 +103,7 @@ fixtures = {
             "channel_id": -1001829933123,
         },
     ],
-    "channel_by_audiences": [
+    "channel_to_audience": [
         {
             "channel_id": 1,
             "audience_id": 1,
