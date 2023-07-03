@@ -3,7 +3,7 @@ import logging
 import handlers
 from db.fixtures import fixtures
 from keyboards.set_main_menu import set_main_menu
-from loader import dp, logger, bot, db,scheduler
+from loader import dp, logger, bot, db, scheduler
 
 
 # Функция конфигурирования и запуска бота
@@ -38,7 +38,6 @@ async def main():
     # Пропускаем накопившиеся апдейты и запускаем polling
     await bot.delete_webhook(drop_pending_updates=True)
     await dp.start_polling(bot)
-
 
 
 if __name__ == '__main__':
