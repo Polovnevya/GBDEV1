@@ -157,7 +157,7 @@ class Post(Base, DateBaseModel):
     id: Mapped[int] = mapped_column(Integer, primary_key=True)
     message_id: Mapped[int] = mapped_column(unique=False, nullable=False)
     vacancy_id: Mapped[int] = mapped_column(ForeignKey("vacancies.id"), nullable=False)
-    channel_id: Mapped[int] = mapped_column(BigInteger, ForeignKey("channels.id"), nullable=False)
+    channel_id: Mapped[int] = mapped_column(BigInteger, ForeignKey("channels.channel_id"), nullable=False)
 
     # def __repr__(self):
     #     return f"<id: {self.id}, vacancy_id: {self.vacancy_id}, message_id: {self.message_id} " \

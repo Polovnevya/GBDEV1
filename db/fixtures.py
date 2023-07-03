@@ -116,12 +116,12 @@ fixtures = {
     "post": [
         {
             "vacancy_id": 1,
-            "channel_id": 1,
+            "channel_id": -1001753724398,
             "message_id": 1,
         },
         {
             "vacancy_id": 2,
-            "channel_id": 2,
+            "channel_id": -1001753724398,
             "message_id": 2,
         },
     ]
