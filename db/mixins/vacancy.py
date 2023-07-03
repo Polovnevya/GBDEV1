@@ -138,12 +138,12 @@ class DAOVacancyMixin:
 
     async def insert_vacancy(self, vacancy: DAOVacancyData) -> None:
 
-            await self.sql_manager.create_async_session()
-            async with self.sql_manager.async_session() as session:
-                async with session.begin():
-                    stmt = select(Vacancy).filter_by(**vacancy.__dict__)
-                    result = await session.scalar(stmt)
+        await self.sql_manager.create_async_session()
+        async with self.sql_manager.async_session() as session:
+            async with session.begin():
+                stmt = select(Vacancy).filter_by(**vacancy.__dict__)
+                result = await session.scalar(stmt)
 
-                    if not result:
-                        session.add(Vacancy(**vacancy.__dict__))
-                        session.commit()
+                if not result:
+                    session.add(Vacancy(**vacancy.__dict__))
+                    session.commit()
