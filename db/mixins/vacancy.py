@@ -26,7 +26,6 @@ class DAOVacancyMixin:
                     vacancy = tmp
 
                     return DAOVacancyData(
-                        id=vacancy.id,
                         employer_id=vacancy.employer_id,
                         audience_id=vacancy.audience_id,
                         name=vacancy.name,
@@ -137,5 +136,14 @@ class DAOVacancyMixin:
         # ]
         # return vacancy_data
 
-    async def insert_vacancy(self,vacancy:DAOVacancyData):
-        pass
+    async def insert_vacancy(self, vacancy: DAOVacancyData) -> None:
+
+        await self.sql_manager.create_async_session()
+        async with self.sql_manager.async_session() as session:
+            async with session.begin():
+                stmt = select(Vacancy).filter_by(**vacancy.__dict__)
+                result = await session.scalar(stmt)
+
+                if not result:
+                    session.add(Vacancy(**vacancy.__dict__))
+                    session.commit()
