@@ -1,3 +1,5 @@
+from typing import List
+
 from sqlalchemy import inspect, select
 from sqlalchemy.ext.asyncio import create_async_engine, async_sessionmaker, engine
 from .models import Base, Candidate, Employer, Audience, Vacancy, Feedback, Post, Channel
@@ -86,7 +88,16 @@ class DAO(DAOCandidateMixin, DAOFeedbackMixin, DAOVacancyMixin, DAOEmployerData)
                         kwargs = item.__dict__
                         kwargs.pop('_sa_instance_state')
                         stmt = select(key).filter_by(**kwargs)
-                        result = await session.scalars(stmt)
-                        if not result.first():
+                        result = await session.scalar(stmt)
+
+                        if not result:
                             session.add(key(**kwargs))
                             session.commit()
+
+    # TODO запилить реализацию или вынести в миксин - добавление поста. принимает ид тг канала, ид сообщения и ид вакансии
+    async def insert_post(self, channel_id: int, message_id: int, vacancy_id: int):
+        pass
+
+    # TODO запилить реализацию или вынести в миксин. Возвращает список не удаленных id тг каналов, в зависимости от аудитории
+    async def get_channels_id_by_audience(self, audience_id: int) -> List[int]:
+        return [-1001753724398, -1001829933123]

@@ -57,8 +57,8 @@ fixtures = {
             "employment": EmploymentEnum.full_time,
             "salary": 150_000.50,
             "geolocation": "69.347654, 88.207752",
-            "date_start": datetime.now(),
-            "date_end": datetime.now() + timedelta(days=1),
+            "date_start": datetime(2023, 7, 2, 18, 42, 13, 933058),
+            "date_end": datetime(2023, 7, 4, 18, 42, 13, 933058),
         },
         {
             "name": "грузчик",
@@ -68,8 +68,19 @@ fixtures = {
             "employment": EmploymentEnum.internship,
             "salary": 15_000.75,
             "geolocation": "69.348269, 88.212360",
-            "date_start": datetime.now(),
-            "date_end": datetime.now() + timedelta(days=2),
+            "date_start": datetime(2023, 7, 2, 18, 42, 13, 933058),
+            "date_end": datetime(2023, 7, 4, 18, 42, 13, 933058),
+        },
+        {
+            "name": "пинатель хуёв",
+            "employer_id": 2,
+            "audience_id": 2,
+            "work_schedule": WorkScheduleEnum.flexible,
+            "employment": EmploymentEnum.internship,
+            "salary": 15_000.75,
+            "geolocation": "69.346666, 88.211111",
+            "date_start": datetime(2023, 7, 2, 18, 42, 13, 933058),
+            "date_end": datetime(2023, 7, 4, 18, 42, 13, 933058),
         },
     ],
     "feedback": [
@@ -84,12 +95,12 @@ fixtures = {
     ],
     "channel": [
         {
-            "name": "IT вакансии",
-            "channel_id": 1,
+            "name": "IT вакансии 1",
+            "channel_id": -1001753724398,
         },
         {
             "name": "неквалифицированные вакансии",
-            "channel_id": 2,
+            "channel_id": -1001829933123,
         },
     ],
     "channel_by_audiences": [

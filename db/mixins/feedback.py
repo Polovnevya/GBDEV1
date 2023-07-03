@@ -14,11 +14,12 @@ class DAOFeedbackMixin:
                     Feedback.candidate_id == vacancy_response.candidate_id).where(
                     Feedback.deleted_at is not None)
                 result = await session.scalars(stmt)
-                if not result.first():
+                tmp = result.first()
+                if not tmp:
                     session.add(Feedback(**vacancy_response.__dict__))
-                    session.commit()
+                    await session.commit()
                 else:
-                    feedback = result.first()
+                    feedback = tmp
                     feedback.vacancy_id = vacancy_response.vacancy_id
                     feedback.candidate_id = vacancy_response.vacancy_id
                     session.commit()

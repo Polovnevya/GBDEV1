@@ -1,7 +1,8 @@
 from decimal import Decimal
 from typing import List
 from sqlalchemy import Enum, Float, Boolean, Table, Column
-from sqlalchemy import Integer, String, DateTime, ForeignKey
+from sqlalchemy import Integer, String, DateTime, ForeignKey, BigInteger
+from sqlalchemy.ext.asyncio import AsyncAttrs
 from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column, validates
 from sqlalchemy.orm import relationship
 from datetime import datetime
@@ -12,7 +13,7 @@ from validate_email import validate_email
 from db.types import GenderEnum, AgeCategoriesEnum, EducationEnum, WorkScheduleEnum, EmploymentEnum
 
 
-class Base(DeclarativeBase):
+class Base(AsyncAttrs, DeclarativeBase):
     pass
 
 
@@ -108,6 +109,7 @@ class Vacancy(Base, DateBaseModel):
     date_start: Mapped[datetime] = mapped_column(DateTime)
     date_end: Mapped[datetime] = mapped_column(DateTime)
 
+
     # def __repr__(self):
     #     return f"<id: {self.id}, vacancy_name: {self.name}, employer_id: {self.employer_id}, " \
     #            f"audience_id: {self.audience_id}, work_schedule: {self.work_schedule}, salary: {self.salary}, " \
@@ -141,7 +143,7 @@ class Channel(Base, DateBaseModel):
 
     id: Mapped[int] = mapped_column(Integer, primary_key=True)
     name: Mapped[str] = mapped_column(String, nullable=False)
-    channel_id: Mapped[int] = mapped_column(unique=True, nullable=False)
+    channel_id: Mapped[int] = mapped_column(BigInteger, unique=True, nullable=False)
     audience: Mapped[List[Audience]] = relationship(secondary=channel_to_audience)
 
     # def __repr__(self):

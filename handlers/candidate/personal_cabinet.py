@@ -1,44 +1,50 @@
 from typing import Dict, List
 
-from aiogram import Router, F
+from aiogram import Router, F, Bot
 from aiogram.enums import ContentType
-from aiogram.filters import Command, StateFilter
+from aiogram.filters import Command, StateFilter, CommandObject
 from aiogram.fsm.context import FSMContext
-from aiogram.types import Message, CallbackQuery, ReplyKeyboardRemove
-from db.models import GenderEnum, AgeCategoriesEnum, EducationEnum, Feedback
+from aiogram.types import Message, CallbackQuery, ReplyKeyboardRemove, ChatInviteLink
+
+from db.models import GenderEnum, AgeCategoriesEnum, EducationEnum
 from db.types import DAOFeedbackData, DAOVacancyData, DAOCandidateData
 from keyboards.candidate import kb_contact, kb_geo
 from keyboards.inline.candidate import (
     get_gender_keyboard_fab, GenderCallback, AgeCallback, get_age_keyboard_fab,
     EducationCallback, get_education_keyboard_fab, get_personal_data_keyboard, PersonalData, )
-from keyboards.inline.vacancy_paginator import get_vacancy_parinator_keyboard_fab, Paginator, Navigation, \
-    VacancyResponse
+from keyboards.inline.vacancy_paginator import Paginator, Navigation, \
+    VacancyResponse, get_vacancy_paginator_keyboard_fab
 from loader import db
 from states.candidate import FSMCandidatePoll
+from utils.appsched import auto_posting
 
 candidate_pc_router: Router = Router()
 
 
 @candidate_pc_router.message(Command(commands=['start']))  # , StateFilter(default_state))
-async def process_start_command(message: Message, state: FSMContext, ):
+async def process_start_command(message: Message, state: FSMContext, command: CommandObject):
     await state.clear()
+    args = command.args
+    if args:
+        await state.update_data({"vacancy_id": args})
+
     await message.answer(f"Добрый день {message.from_user.full_name}!\n"
                          f"Для создания отклика пройдите небольшой анкетирование",
                          reply_markup=ReplyKeyboardRemove())
 
-    result = await db.get_candidate_by_id(message.from_user.id)
+    result: DAOCandidateData = await db.get_candidate_by_id(message.from_user.id)
     if not result:
         await message.answer(f"Введите Ваше имя")
         await state.set_state(FSMCandidatePoll.first_name)
     else:
         await message.answer(f"Это корректные данные?\n"
-                             f"Имя: {result.get('first_name')} \n"
-                             f"Отчество: {result.get('middle_name')} \n"
-                             f"Фамилия: {result.get('last_name')} \n"
-                             f"Пол: {result.get('gender')} \n"
-                             f"Возраст: {result.get('age')} \n"
-                             f"Образование: {result.get('education')} \n"
-                             f"Телефон: {result.get('phone')}",
+                             f"Имя: {result.first_name} \n"
+                             f"Отчество: {result.middle_name} \n"
+                             f"Фамилия: {result.last_name} \n"
+                             f"Пол: {result.gender} \n"
+                             f"Возраст: {result.age} \n"
+                             f"Образование: {result.education} \n"
+                             f"Телефон: {result.phone}",
                              reply_markup=get_personal_data_keyboard())
         await state.set_state(FSMCandidatePoll.load_pd)
 
@@ -128,20 +134,27 @@ async def process_get_phone(message: Message, state: FSMContext):
 
 
 @candidate_pc_router.message(StateFilter(FSMCandidatePoll.geolocation), F.content_type.in_({ContentType.LOCATION}))
-async def process_show_vacancy(message: Message, state: FSMContext):
+async def process_show_vacancy(message: Message, state: FSMContext, bot: Bot):
     longitude: float = message.location.longitude
     latitude: float = message.location.latitude
     result: List[DAOVacancyData] = await db.get_vacancy_by_geolocation(longitude, latitude)
+
+    data = await state.get_data()
+    vacancy_id_response = data.get("vacancy_id")
+    if vacancy_id_response:
+        vacancy: DAOVacancyData = await db.get_vacancy_by_id(int(vacancy_id_response))
+        result.append(vacancy)
+
     await state.set_state(FSMCandidatePoll.show_vacancy)
     await state.update_data({"vacancy": result})
     await state.update_data({"paginator": result})
 
-    vacancy_paginator: Paginator = get_vacancy_parinator_keyboard_fab(result)
+    vacancy_paginator: Paginator = get_vacancy_paginator_keyboard_fab(result)
     await state.update_data({"paginator": vacancy_paginator})
     current_vacancy_data: DAOVacancyData = result[0]
-    await message.answer(f"Текст вакансии: {current_vacancy_data.get('name')}\n"
-                         f"Оплата: {current_vacancy_data.get('salary')}\n"
-                         f"График: {current_vacancy_data.get('work_schedule')}\n",
+    await message.answer(f"Текст вакансии: {current_vacancy_data.name}\n"
+                         f"Оплата: {current_vacancy_data.salary}\n"
+                         f"График: {current_vacancy_data.work_schedule.value}\n",
                          reply_markup=await vacancy_paginator.update_kb())
 
 
@@ -150,9 +163,12 @@ async def process_show_vacancy(message: Message, state: FSMContext):
 async def process_vacancy_response(query: CallbackQuery, callback_data: VacancyResponse):
     id_vacancy: int = int(callback_data.id_vacancy)
     # записываем отклик в базу
-    await db.insert_or_update_vacancy_response(DAOFeedbackData(candidate_id=query.message.from_user.id,
-                                                               id_vacancy=id_vacancy))
+    result: DAOCandidateData = await db.get_candidate_by_id(query.from_user.id)
+    await db.insert_or_update_vacancy_response(DAOFeedbackData(candidate_id=result.id,
+                                                               vacancy_id=id_vacancy))
     await query.answer("Отклик создан")
+    # TODO добавить описание вакансии
+    await query.message.answer("Отклик создан")
 
 
 #
@@ -164,9 +180,9 @@ async def process_forward_show_vacancy(query: CallbackQuery, state: FSMContext):
     await vacancy_paginator.on_next()
     await state.update_data({"paginator": vacancy_paginator})
     current_vacancy_data: Dict = result.get("vacancy")[vacancy_paginator.page]
-    await query.message.edit_text(f"Текст вакансии: {current_vacancy_data.get('name')}\n"
-                                  f"Оплата: {current_vacancy_data.get('salary')}\n"
-                                  f"График: {current_vacancy_data.get('work_schedule')}\n",
+    await query.message.edit_text(f"Текст вакансии: {current_vacancy_data.name}\n"
+                                  f"Оплата: {current_vacancy_data.salary}\n"
+                                  f"График: {current_vacancy_data.work_schedule.value}\n",
                                   reply_markup=await vacancy_paginator.update_kb())
 
 
@@ -178,9 +194,9 @@ async def process_backward_show_vacancy(query: CallbackQuery, state: FSMContext)
     await vacancy_paginator.on_prev()
     await state.update_data({"paginator": vacancy_paginator})
     current_vacancy_data: Dict = result.get("vacancy")[vacancy_paginator.page]
-    await query.message.edit_text(f"Текст вакансии: {current_vacancy_data.get('name')}\n"
-                                  f"Оплата: {current_vacancy_data.get('salary')}\n"
-                                  f"График: {current_vacancy_data.get('work_schedule')}\n",
+    await query.message.edit_text(f"Текст вакансии: {current_vacancy_data.name}\n"
+                                  f"Оплата: {current_vacancy_data.salary}\n"
+                                  f"График: {current_vacancy_data.work_schedule.value}\n",
                                   reply_markup=await vacancy_paginator.update_kb())
 
 

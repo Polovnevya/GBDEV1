@@ -6,7 +6,6 @@ from datetime import datetime
 # dataclasses
 @dataclass
 class DAOFeedbackData:
-    id: int
     candidate_id: int
     vacancy_id: int
 
@@ -16,6 +15,7 @@ class DAOVacancyData:
     id: int
     employer_id: int
     audience_id: int
+    name: str
     work_schedule: str
     employment: str
     salary: float
@@ -35,6 +35,7 @@ class DAOCandidateData:
     education: str
     phone: str
     tg_id: str
+    id: int = None
 
 
 @dataclass

@@ -21,10 +21,12 @@ class DAOCandidateMixin:
                 stmt = select(Candidate).where(Candidate.tg_id == candidate_tg_id).where(
                     Candidate.deleted_at is not None)
                 result = await session.scalars(stmt)
-                if result.first():
-                    candidate = result.first()
+                tmp = result.first()
+                if tmp:
+                    candidate = tmp
 
-                    return DAOCandidateData(first_name=candidate.first_name,
+                    return DAOCandidateData(id=candidate.id,
+                                            first_name=candidate.first_name,
                                             middle_name=candidate.middle_name,
                                             last_name=candidate.last_name,
                                             gender=candidate.gender.value,
@@ -48,11 +50,12 @@ class DAOCandidateMixin:
             async with session.begin():
                 stmt = select(Candidate).where(Candidate.tg_id == candidate_data.tg_id)
                 result = await session.scalars(stmt)
-                if not result.first():
+                tmp = result.first()
+                if not tmp:
                     session.add(Candidate(**candidate_data.__dict__))
                     session.commit()
                 else:
-                    candidate = result.first()
+                    candidate = tmp
                     candidate.first_name = candidate_data.first_name
                     candidate.middle_name = candidate_data.middle_name
                     candidate.education = candidate_data.education
@@ -60,3 +63,10 @@ class DAOCandidateMixin:
                     candidate.phone = candidate_data.phone
                     candidate.gender = candidate_data.gender
                     session.commit()
+
+    # TODO конвертер tg_id -> candidate.id
+    @staticmethod
+    async def get_candidate_id_by_tguser_id(fg_id: int):
+        candidate_id = fg_id
+        candidate_id = 3
+        return candidate_id
