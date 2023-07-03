@@ -1,17 +1,20 @@
 import psycopg2
+import config
 
 
 class Reporting:
-    database = 'gbdev1',
-    user = 'postgres',
-    password = 'postgres',
-    host = 'localhost'
+
+    def __init__(self):
+        self.database = config.config.load_config().db.database
+        self.user = config.config.load_config().db.db_user
+        self.password = config.config.load_config().db.db_password
+        self.host = config.config.load_config().db.db_host
 
     def get_cursor(self):
-        con = psycopg2.connect(database=Reporting.database[0],
-                               user=Reporting.user[0],
-                               password=Reporting.password[0],
-                               host=Reporting.host)
+        con = psycopg2.connect(database=self.database,
+                               user=self.user,
+                               password=self.password,
+                               host=self.host)
         cursor = con.cursor()
         return cursor
 
@@ -22,9 +25,7 @@ class Reporting:
         cursor.execute(my_request)
         return cursor.fetchall()
 
-
-'''a = Reporting()
-my_request = (f'SELECT vacancies.name, COUNT(posts.id)\n'
+'''my_request = (f'SELECT vacancies.name, COUNT(posts.id)\n'
               f'FROM posts\n'
               f'JOIN vacancies ON posts.vacancy_id = vacancies.id\n'
               f'JOIN employers ON employers.id = vacancies.employer_id\n'
