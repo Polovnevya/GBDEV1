@@ -103,7 +103,7 @@ async def process_button_2_press(callback: CallbackQuery, bot: Bot):
                     f.write(f'\n')
     document = FSInputFile(path=f'unloading/{callback.from_user.id}/reporting.txt')
     await bot.send_document(callback.message.chat.id, document=document)
-    with open(f'unloading/{callback.from_user.id}/reporting.txt', 'w') as f:
+    with open(f'files/unloading/{callback.from_user.id}/reporting.txt', 'w') as f:
         pass
 
 
