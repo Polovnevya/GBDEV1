@@ -106,7 +106,7 @@ async def process_button_2_press(callback: CallbackQuery,
     list_name_request = [('id',
                           'Наименование вакансии',
                           'Количество опубликованных постов с вакансией',
-                          'Количество откликов на вакансии',)]
+                          'Количество откликов на вакансию',)]
     list_name_request.extend(records)
 
     path_file_to_reporting = f'files/work/unloading/{callback.from_user.id}'
