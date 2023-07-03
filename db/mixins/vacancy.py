@@ -137,3 +137,6 @@ class DAOVacancyMixin:
         #     },
         # ]
         # return vacancy_data
+
+    async def insert_vacancy(self,vacancy:DAOVacancyData):
+        pass
