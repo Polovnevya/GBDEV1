@@ -12,7 +12,7 @@ async def main():
     await db.delete_db_tables(is_delete=True)
     await db.create_db_tables()
     await db.load_fixtures(fixtures)
-    await db.insert_post(channel_id=-1001829933123, vacancy_id=1, message_id=1)
+
 
     # Конфигурируем логирование
     logging.basicConfig(
