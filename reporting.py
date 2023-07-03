@@ -25,10 +25,3 @@ class Reporting:
         cursor.execute(my_request)
         return cursor.fetchall()
 
-'''my_request = (f'SELECT vacancies.name, COUNT(posts.id)\n'
-              f'FROM posts\n'
-              f'JOIN vacancies ON posts.vacancy_id = vacancies.id\n'
-              f'JOIN employers ON employers.id = vacancies.employer_id\n'
-              f'WHERE employers.tg_id = 1052862634\n'
-              f'GROUP BY vacancies.id')
-print(a.get_reporting(my_request))'''
