@@ -10,7 +10,7 @@ from filters.employer import IsEmployer
 from keyboards.inline.employer import get_start_employer_keyboard, EmployerLoadCB, EmployerReportingCB
 from states.employer import FSMFormEvent
 from reporting import Reporting
-from requests import request1, request2
+from requests import request3
 
 employer_pc_router: Router = Router()
 employer_pc_router.message.filter(IsEmployer(config.employers.employers_ids))
@@ -83,30 +83,26 @@ async def download_document(message: Message, bot: Bot):
 @employer_pc_router.callback_query(EmployerReportingCB.filter())
 async def process_button_2_press(callback: CallbackQuery,
                                  bot: Bot,):
-    request_list = []
-    list_name_request = ['Количество откликов на вакансии:',
-                         'Количество опубликованных постов с вакансией:']
-    for elm in [request1, request2]:
-        mod_request = elm + (f'WHERE employers.tg_id = {callback.from_user.id}\n'
-                             f'GROUP BY vacancies.id')
-        report = Reporting()
-        records = report.get_reporting(mod_request)
-        request_list.append(records)
-        path_file_to_reporting = f'files/work/unloading/{callback.from_user.id}'
+    report = Reporting()
+    records = report.get_reporting(request3)
+    list_name_request = [('id',
+                          'Наименование вакансии',
+                          'Количество опубликованных постов с вакансией',
+                          'Количество откликов на вакансии',)]
+    list_name_request.extend(records)
+
+    path_file_to_reporting = f'files/work/unloading/{callback.from_user.id}'
     if not os.path.exists(path_file_to_reporting):
         os.mkdir(path_file_to_reporting)
-    for i in range(len(request_list)):
-        with open(f'{path_file_to_reporting}/reporting.txt', 'a+', encoding="utf-8") as f:
-            f.write(f'{list_name_request[i]}\n')
-        for j in range(len(request_list[i])):
-            with open(f'{path_file_to_reporting}/reporting.txt', 'a+', encoding="utf-8") as f:
-                f.write(f'{request_list[i][j][0]}: {request_list[i][j][1]}\n')
-                if j == len(request_list[i])-1:
-                    f.write(f'\n')
-    document = FSInputFile(path=f'{path_file_to_reporting}/reporting.txt')
+    for i in range(len(list_name_request)):
+        with open(f'{path_file_to_reporting}/reporting.csv', 'a+', encoding="utf-8") as f:
+            f.write(f'{",".join(map(str, list_name_request[i]))}\n')
+    df = pd.read_csv(f'{path_file_to_reporting}/reporting.csv')
+    df.to_excel(f'{path_file_to_reporting}/output.xlsx', engine='openpyxl')
+    document = FSInputFile(path=f'{path_file_to_reporting}/output.xlsx')
     await callback.message.answer(text='Отчет сформирован.')
     await bot.send_document(callback.message.chat.id, document=document)
-    with open(f'{path_file_to_reporting}/reporting.txt', 'w') as f:
+    with open(f'{path_file_to_reporting}/reporting.csv', 'w') as f:
         pass
 
 
