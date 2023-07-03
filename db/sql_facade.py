@@ -8,7 +8,7 @@ from .mixins.vacancy import DAOVacancyMixin
 from .mixins.feedback import DAOFeedbackMixin
 from .mixins.emloyer import DAOEmployerData
 from .mixins.channel import DAOChannelMixin
-
+from .mixins.post import DAOPostMixin
 
 class SqlManager:
     def __init__(self, config: Config):
@@ -46,7 +46,7 @@ class SqlManager:
         self.async_connection = self.async_engine.connect()
 
 
-class DAO(DAOCandidateMixin, DAOFeedbackMixin, DAOVacancyMixin, DAOEmployerData, DAOChannelMixin):
+class DAO(DAOCandidateMixin, DAOFeedbackMixin, DAOVacancyMixin, DAOEmployerData, DAOChannelMixin, DAOPostMixin):
     def __init__(self, sql_manager: SqlManager):
         self.sql_manager = sql_manager
 
