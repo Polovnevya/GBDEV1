@@ -81,7 +81,8 @@ async def download_document(message: Message, bot: Bot):
 
 # Этот хэндлер будет срабатывать на отправку отчетности по размещённым вакансиям
 @employer_pc_router.callback_query(EmployerReportingCB.filter())
-async def process_button_2_press(callback: CallbackQuery, bot: Bot):
+async def process_button_2_press(callback: CallbackQuery,
+                                 bot: Bot,):
     request_list = []
     list_name_request = ['Количество откликов на вакансии:',
                          'Количество опубликованных постов с вакансией:']
@@ -103,6 +104,7 @@ async def process_button_2_press(callback: CallbackQuery, bot: Bot):
                 if j == len(request_list[i])-1:
                     f.write(f'\n')
     document = FSInputFile(path=f'{path_file_to_reporting}/reporting.txt')
+    await callback.message.answer(text='Отчет сформирован.')
     await bot.send_document(callback.message.chat.id, document=document)
     with open(f'{path_file_to_reporting}/reporting.txt', 'w') as f:
         pass
