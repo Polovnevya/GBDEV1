@@ -24,4 +24,3 @@ class Reporting:
         cursor = sample_cursor.get_cursor()
         cursor.execute(my_request)
         return cursor.fetchall()
-

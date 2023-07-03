@@ -1,4 +1,3 @@
-# Количество откликов на вакансию
 request1 = (f'SELECT vacancies.id, vacancies.name, COUNT(candidates.id)\n'
             f'FROM employers\n'
             f'JOIN vacancies ON employers.id = vacancies.employer_id\n'
