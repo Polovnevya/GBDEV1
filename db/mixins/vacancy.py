@@ -60,7 +60,6 @@ class DAOVacancyMixin:
 
                 for vacancy in vacancies:
                     vacancy_data = DAOVacancyData(
-                        id=vacancy.id,
                         employer_id=vacancy.employer_id,
                         audience_id=vacancy.audience_id,
                         name=vacancy.name,
