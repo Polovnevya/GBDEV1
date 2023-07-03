@@ -57,7 +57,7 @@ class DAOVacancyMixin:
                 stmt = select(Vacancy).where(Vacancy.deleted_at is not None)
                 vacancies = await session.scalars(stmt)
 
-                for vacancy in vacancies:
+                for vacancy in vacancies.unique():
                     vacancy_data = DAOVacancyData(
                         employer_id=vacancy.employer_id,
                         audience_id=vacancy.audience_id,
