@@ -12,7 +12,6 @@ class DAOFeedbackData:
 
 @dataclass
 class DAOVacancyData:
-    id: int
     employer_id: int
     audience_id: int
     name: str
