@@ -1,14 +1,14 @@
 import psycopg2
-import config
+from config.config import load_config
 
 
 class Reporting:
 
     def __init__(self):
-        self.database = config.config.load_config().db.database
-        self.user = config.config.load_config().db.db_user
-        self.password = config.config.load_config().db.db_password
-        self.host = config.config.load_config().db.db_host
+        self.database = load_config().db.database
+        self.user = load_config().db.db_user
+        self.password = load_config().db.db_password
+        self.host = load_config().db.db_host
 
     def get_cursor(self):
         con = psycopg2.connect(database=self.database,
