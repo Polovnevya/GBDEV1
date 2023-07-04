@@ -15,17 +15,12 @@ class Reporting:
         self.db_password = db_password
         self.db_host = db_host
 
-    def get_cursor(self):
+    def get_reporting(self, my_request):
+        self.my_request = my_request
         con = psycopg2.connect(database=self.database,
                                user=self.db_user,
                                password=self.db_password,
                                host=self.db_host)
         cursor = con.cursor()
-        return cursor
-
-    def get_reporting(self, my_request):
-        self.my_request = my_request
-        sample_cursor = Reporting()
-        cursor = sample_cursor.get_cursor()
         cursor.execute(my_request)
         return cursor.fetchall()
