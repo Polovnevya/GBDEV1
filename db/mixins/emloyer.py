@@ -1,7 +1,7 @@
 from typing import Union
 from sqlalchemy import select
 from ..models import Employer
-from ..types import DAOEmployerData
+from ..types import DAOEmployerData, Reporting
 
 
 class DAOEmployerMixin:
@@ -28,3 +28,16 @@ class DAOEmployerMixin:
                         phone=employer.phone,
                         tg_id=employer.tg_id,
                     )
+
+    async def get_reporting(self, user_id: int = None) -> list[Reporting]:
+        """
+        возвращает список кортежей.
+        в каждом кортеже содержиться информация относительно одной вакансии, а именно:
+        - id вакансии;
+        - наименование вакансии;
+        - количество опубликованных постов с вакансией;
+        - количество откликов на вакансию.
+        Вакансии которые были удалены, и отклики по ним, не учитываются.
+
+        """
+        pass
