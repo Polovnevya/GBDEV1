@@ -77,3 +77,12 @@ class AgeCategoriesEnum(enum.Enum):
     junior = "от 18 до 25"
     middle = "от 25 до 40"
     senior = "от 40 до 60"
+
+
+@dataclass
+class Reporting:
+    vacancy_id: int
+    vacancy_name: str
+    number_posts: int
+    number_responses: int
+    
