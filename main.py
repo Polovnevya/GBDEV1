@@ -13,7 +13,6 @@ async def main():
     await db.create_db_tables()
     await db.load_fixtures(fixtures)
 
-
     # Конфигурируем логирование
     logging.basicConfig(
         level=logging.INFO,
