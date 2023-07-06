@@ -40,7 +40,7 @@ class DAOEmployerMixin:
         Вакансии которые были удалены, и отклики по ним, не учитываются.
 
         """
-        vacancies_list = []
+        reports = []
 
         await self.sql_manager.create_async_session()
         async with self.sql_manager.async_session() as session:
@@ -59,10 +59,10 @@ class DAOEmployerMixin:
                     posts = posts.unique()
                     responses = feedbacks.unique()
 
-                    vacancies_list.append(Reporting(
+                    reports.append(Reporting(
                         vacancy_id=vacancy_id,
                         vacancy_name=vacancy_name,
                         number_posts=len([post for post in posts]),
                         number_responses=len([response for response in responses])
                     ))
-        return vacancies_list
+        return reports
