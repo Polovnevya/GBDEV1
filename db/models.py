@@ -10,7 +10,7 @@ from datetime import datetime
 from sqlalchemy_utils import EmailType, PhoneNumberType
 from validate_email import validate_email
 
-from db.types import GenderEnum, AgeCategoriesEnum, EducationEnum, WorkScheduleEnum, EmploymentEnum
+from db.types import GenderEnum, AgeCategoriesEnum, EducationEnum, WorkScheduleEnum, EmploymentEnum, AudienceEnum
 
 
 class Base(AsyncAttrs, DeclarativeBase):
@@ -68,7 +68,8 @@ class Audience(Base, DateBaseModel):
     __tablename__ = "audiences"
 
     id: Mapped[int] = mapped_column(primary_key=True)
-    name: Mapped[str] = mapped_column(String, nullable=False)
+    # name: Mapped[str] = mapped_column(String, nullable=False)
+    name: Mapped[Enum] = mapped_column(Enum(AudienceEnum), nullable=False)
     vacancy: Mapped[List["Vacancy"]] = relationship(lazy="joined")
 
     # def __repr__(self):
