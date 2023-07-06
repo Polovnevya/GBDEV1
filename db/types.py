@@ -44,6 +44,13 @@ class DAOEmployerData:
     email: str
     tg_id: str
 
+@dataclass
+class Reporting:
+    vacancy_id: int
+    vacancy_name: str
+    number_posts: int
+    number_responses: int
+
 
 # enums
 
@@ -79,10 +86,6 @@ class AgeCategoriesEnum(enum.Enum):
     senior = "от 40 до 60"
 
 
-@dataclass
-class Reporting:
-    vacancy_id: int
-    vacancy_name: str
-    number_posts: int
-    number_responses: int
-    
+class AudienceEnum(enum.Enum):
+    IT = "IT"
+    unskilled_workers = "неквалифицированные работники"
