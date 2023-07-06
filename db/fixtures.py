@@ -1,4 +1,4 @@
-from .models import EducationEnum, AgeCategoriesEnum, GenderEnum, WorkScheduleEnum, EmploymentEnum
+from .models import EducationEnum, AgeCategoriesEnum, GenderEnum, WorkScheduleEnum, EmploymentEnum, AudienceEnum
 from datetime import datetime, timedelta
 
 fixtures = {
@@ -42,10 +42,10 @@ fixtures = {
     ],
     "audience": [
         {
-            "name": "IT",
+            "name": AudienceEnum.IT,
         },
         {
-            "name": "неквалифицированные работники"
+            "name": AudienceEnum.unskilled_workers,
         },
     ],
     "vacancy": [
