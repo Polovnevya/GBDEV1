@@ -9,7 +9,7 @@ from loader import dp, logger, bot, db, scheduler
 # Функция конфигурирования и запуска бота
 async def main():
     # Создает таблицы в бд
-    await db.delete_db_tables(is_delete=True)
+    await db.delete_db_tables(is_delete=False)
     await db.create_db_tables()
     await db.load_fixtures(fixtures)
 
