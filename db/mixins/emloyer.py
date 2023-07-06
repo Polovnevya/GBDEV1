@@ -66,3 +66,10 @@ class DAOEmployerMixin:
                         number_responses=len([response for response in responses])
                     ))
         return reports
+
+    async def get_employer_id_by_tguser_id(self, tg_id: int) -> int:
+        await self.sql_manager.create_async_session()
+        async with self.sql_manager.async_session() as session:
+            async with session.begin():
+                employer = await session.scalar(select(Employer).filter_by(tg_id=tg_id))
+        return employer.id
