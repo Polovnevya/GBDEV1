@@ -10,7 +10,9 @@ from filters.employer import IsEmployer
 from keyboards.inline.employer import get_start_employer_keyboard, EmployerLoadCB, EmployerReportingCB
 from states.employer import FSMFormEvent
 from reporting import Reporting
-# from requests import request3
+from db.types import DAOVacancyData, WorkScheduleEnum, EmploymentEnum, AudienceEnum
+from loader import db
+import datetime
 
 employer_pc_router: Router = Router()
 employer_pc_router.message.filter(IsEmployer(config.employers.employers_ids))
@@ -52,18 +54,22 @@ async def download_document(message: Message, bot: Bot):
         df = pd.read_excel(f'{name_form}.xlsx')
         df.to_csv(f'{name_form}.csv', index=False)
         df = pd.read_csv(f'{name_form}.csv')
-        vacancy_dict = {}
         for i in range(len(df)):
-            vacancy_dict[i] = {'vacancy_name': df.loc[i, 'должность'],
-                               'audience': df.loc[i, 'специализация'],
-                               'employment': df.loc[i, 'тип занятости'],
-                               'work_schedule': df.loc[i, 'график работы'],
-                               'gender': df.loc[i, 'пол'],
-                               'education': df.loc[i, 'образование'],
-                               'salary': df.loc[i, 'размер заработной платы: руб.']}
+            await db.insert_vacancy(
+                DAOVacancyData(employer_id=await db.get_employer_id_by_tguser_id(message.from_user.id),
+                               audience_id=await db.get_audience_id_by_name(AudienceEnum(df.loc[i, 'специализация'])),
+                               name=df.loc[i, 'должность'],
+                               work_schedule=WorkScheduleEnum(df.loc[i, 'график работы']),
+                               employment=EmploymentEnum(df.loc[i, 'тип занятости']),
+                               salary=float(df.loc[i, 'размер заработной платы: руб.']),
+                               geolocation='69.333333, 88.333333',
+                               is_open=True,
+                               date_start=datetime.datetime.now(),
+                               date_end=datetime.datetime.now()+datetime.timedelta(days=10)
+                               )
+                               )
         os.remove(f'{name_form}.csv')
         await message.answer("Файл поступил и обработан.")
-        return vacancy_dict
     except ValueError:
         await message.answer(f'Вы направили файл иного формата.\n'
                              f'Заполните предоставленную форму и отправьте её в бот.')
@@ -76,7 +82,6 @@ async def download_document(message: Message, bot: Bot):
             os.remove(f'{name_form}.xlsx')
         if os.path.isfile(f'{name_form}.csv'):
             os.remove(f'{name_form}.csv')
-# TODO Произвести запись в базу даных
 
 
 # Этот хэндлер будет срабатывать на отправку отчетности по размещённым вакансиям

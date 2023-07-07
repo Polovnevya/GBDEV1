@@ -1,6 +1,6 @@
 from typing import List
-from sqlalchemy import select
-from ..models import Vacancy
+from sqlalchemy import select, Enum
+from ..models import Vacancy, Audience
 from ..types import DAOVacancyData, WorkScheduleEnum, EmploymentEnum
 from geopy.distance import geodesic as GD
 from operator import attrgetter
@@ -148,3 +148,10 @@ class DAOVacancyMixin:
                 if not result:
                     session.add(Vacancy(**vacancy.__dict__))
                     session.commit()
+
+    async def get_audience_id_by_name(self, name: Enum) -> int:
+        await self.sql_manager.create_async_session()
+        async with self.sql_manager.async_session() as session:
+            async with session.begin():
+                audience = await session.scalar(select(Audience).filter_by(name=name))
+        return audience.id
