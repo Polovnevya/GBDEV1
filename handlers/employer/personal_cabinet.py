@@ -65,8 +65,8 @@ async def download_document(message: Message, bot: Bot):
                                salary=float(df.loc[i, 'размер заработной платы: руб.']),
                                geolocation='69.333333, 88.333333',
                                is_open=True,
-                               date_start=datetime.now(),
-                               date_end=datetime(2023, 7, 4, 18, 42, 13, 933058)
+                               date_start=datetime.datetime.now(),
+                               date_end=datetime.datetime.now()+datetime.timedelta(days=10)
                                )
                                )
         os.remove(f'{name_form}.csv')
