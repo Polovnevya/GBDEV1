@@ -1,5 +1,6 @@
 from .models import EducationEnum, AgeCategoriesEnum, GenderEnum, WorkScheduleEnum, EmploymentEnum, AudienceEnum
 from datetime import datetime, timedelta
+from environs import Env
 
 fixtures = {
     "candidate": [
@@ -39,6 +40,13 @@ fixtures = {
             "email": "badcompany@email.ru",
             "phone": "9444444444",
         },
+        {
+            "user_name": "@MyCompany",
+            "tg_id": 1052862634,
+            "company_name": "моя компания",
+            "email": "my@email.ru",
+            "phone": "9139130000",
+        }
     ],
     "audience": [
         {
