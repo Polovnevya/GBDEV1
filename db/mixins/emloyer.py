@@ -1,6 +1,6 @@
 from typing import Union
-from sqlalchemy import select
-from ..models import Employer, Vacancy, Post, Feedback
+from sqlalchemy import select, Enum
+from ..models import Employer, Vacancy, Post, Feedback, Audience
 from ..types import DAOEmployerData, Reporting
 
 
@@ -73,3 +73,10 @@ class DAOEmployerMixin:
             async with session.begin():
                 employer = await session.scalar(select(Employer).filter_by(tg_id=tg_id))
         return employer.id
+
+    async def get_audience_id_by_name(self, name: Enum) -> int:
+        await self.sql_manager.create_async_session()
+        async with self.sql_manager.async_session() as session:
+            async with session.begin():
+                audience = await session.scalar(select(Audience).filter_by(name=name))
+        return audience.id
