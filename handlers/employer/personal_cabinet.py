@@ -12,7 +12,7 @@ from states.employer import FSMFormEvent
 from reporting import Reporting
 from db.types import DAOVacancyData, WorkScheduleEnum, EmploymentEnum, AudienceEnum
 from loader import db
-from datetime import datetime
+import datetime
 
 employer_pc_router: Router = Router()
 employer_pc_router.message.filter(IsEmployer(config.employers.employers_ids))
@@ -57,7 +57,7 @@ async def download_document(message: Message, bot: Bot):
         # vacancy_dict = {}
         for i in range(len(df)):
             await db.insert_vacancy(
-                DAOVacancyData(employer_id=1,
+                DAOVacancyData(employer_id=await db.get_employer_id_by_tguser_id(message.from_user.id),
                                audience_id=1,#AudienceEnum(df.loc[i, 'специализация']).name,
                                name=df.loc[i, 'должность'],
                                work_schedule=WorkScheduleEnum(df.loc[i, 'график работы']),
