@@ -54,22 +54,7 @@ async def download_document(message: Message, bot: Bot):
         df = pd.read_excel(f'{name_form}.xlsx')
         df.to_csv(f'{name_form}.csv', index=False)
         df = pd.read_csv(f'{name_form}.csv')
-        for i in range(len(df)):
-            await db.insert_vacancy(
-                DAOVacancyData(employer_id=await db.get_employer_id_by_tguser_id(message.from_user.id),
-                               audience_id=await db.get_audience_id_by_name(AudienceEnum(df.loc[i, 'специализация'])),
-                               name=df.loc[i, 'должность'],
-                               work_schedule=WorkScheduleEnum(df.loc[i, 'график работы']),
-                               employment=EmploymentEnum(df.loc[i, 'тип занятости']),
-                               salary=float(df.loc[i, 'размер заработной платы: руб.']),
-                               geolocation='69.333333, 88.333333',
-                               is_open=True,
-                               date_start=datetime.datetime.now(),
-                               date_end=datetime.datetime.now()+datetime.timedelta(days=10)
-                               )
-                               )
         os.remove(f'{name_form}.csv')
-        await message.answer("Файл поступил и обработан.")
     except ValueError:
         await message.answer(f'Вы направили файл иного формата.\n'
                              f'Заполните предоставленную форму и отправьте её в бот.')
@@ -82,6 +67,50 @@ async def download_document(message: Message, bot: Bot):
             os.remove(f'{name_form}.xlsx')
         if os.path.isfile(f'{name_form}.csv'):
             os.remove(f'{name_form}.csv')
+
+    for i in range(len(df)):
+        try:
+            audience_id = await db.get_audience_id_by_name(AudienceEnum(df.loc[i, 'специализация']))
+        except ValueError:
+            await message.answer(f'В вакансии {df.loc[i, "должность"]} ошибка в столбце "Cпециализация"!\n'
+                                 f'Заполните предоставленную форму в соответствии с требованиями и отправьте её в бот.')
+            break
+
+        try:
+            work_schedule = WorkScheduleEnum(df.loc[i, 'график работы'])
+        except ValueError:
+            await message.answer(f'В вакансии {df.loc[i, "должность"]} ошибка в столбце "График работы"!\n'
+                                 f'Заполните предоставленную форму в соответствии с требованиями и отправьте её в бот.\n')
+            break
+
+        try:
+            employment = EmploymentEnum(df.loc[i, 'тип занятости'])
+        except ValueError:
+            await message.answer(f'В вакансии {df.loc[i, "должность"]} ошибка в столбце "Тип занятости"!\n'
+                                 f'Заполните предоставленную форму в соответствии с требованиями и отправьте её в бот.')
+            break
+
+        try:
+            salary = float(df.loc[i, 'размер заработной платы: руб.'])
+        except ValueError:
+            await message.answer(f'В вакансии {df.loc[i, "должность"]} ошибка в столбце "Размер заработной платы"!\n'
+                                 f'Заполните предоставленную форму в соответствии с требованиями и отправьте её в бот.')
+            break
+
+        await db.insert_vacancy(
+            DAOVacancyData(employer_id=await db.get_employer_id_by_tguser_id(message.from_user.id),
+                           audience_id=audience_id,
+                           name=df.loc[i, 'должность'],
+                           work_schedule=work_schedule,
+                           employment=employment,
+                           salary=salary,
+                           geolocation='69.333333, 88.333333',
+                           is_open=True,
+                           date_start=datetime.datetime.now(),
+                           date_end=datetime.datetime.now()+datetime.timedelta(days=10)
+                           ))
+        await message.answer("Файл поступил и обработан.")
+
 
 
 # Этот хэндлер будет срабатывать на отправку отчетности по размещённым вакансиям
