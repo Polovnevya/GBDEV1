@@ -10,7 +10,7 @@ from filters.employer import IsEmployer
 from keyboards.inline.employer import get_start_employer_keyboard, EmployerLoadCB, EmployerReportingCB
 from states.employer import FSMFormEvent
 from reporting import Reporting
-from db.types import DAOVacancyData, WorkScheduleEnum, EmploymentEnum
+from db.types import DAOVacancyData, WorkScheduleEnum, EmploymentEnum, AudienceEnum
 from loader import db
 from datetime import datetime
 
@@ -58,7 +58,7 @@ async def download_document(message: Message, bot: Bot):
         for i in range(len(df)):
             await db.insert_vacancy(
                 DAOVacancyData(employer_id=1,
-                               audience_id=1,
+                               audience_id=1,#AudienceEnum(df.loc[i, 'специализация']).name,
                                name=df.loc[i, 'должность'],
                                work_schedule=WorkScheduleEnum(df.loc[i, 'график работы']),
                                employment=EmploymentEnum(df.loc[i, 'тип занятости']),
