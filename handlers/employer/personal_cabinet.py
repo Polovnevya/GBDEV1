@@ -55,6 +55,7 @@ async def download_document(message: Message, bot: Bot):
         df.to_csv(f'{name_form}.csv', index=False)
         df = pd.read_csv(f'{name_form}.csv')
         os.remove(f'{name_form}.csv')
+
     except ValueError:
         await message.answer(f'Вы направили файл иного формата.\n'
                              f'Заполните предоставленную форму и отправьте её в бот.')
@@ -67,6 +68,7 @@ async def download_document(message: Message, bot: Bot):
             os.remove(f'{name_form}.xlsx')
         if os.path.isfile(f'{name_form}.csv'):
             os.remove(f'{name_form}.csv')
+
 
     for i in range(len(df)):
         try:
