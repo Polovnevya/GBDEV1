@@ -58,7 +58,7 @@ async def download_document(message: Message, bot: Bot):
         for i in range(len(df)):
             await db.insert_vacancy(
                 DAOVacancyData(employer_id=await db.get_employer_id_by_tguser_id(message.from_user.id),
-                               audience_id=1,#AudienceEnum(df.loc[i, 'специализация']).name,
+                               audience_id=await db.get_audience_id_by_name(AudienceEnum(df.loc[i, 'специализация'])),
                                name=df.loc[i, 'должность'],
                                work_schedule=WorkScheduleEnum(df.loc[i, 'график работы']),
                                employment=EmploymentEnum(df.loc[i, 'тип занятости']),
