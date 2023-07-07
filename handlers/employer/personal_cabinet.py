@@ -82,7 +82,6 @@ async def download_document(message: Message, bot: Bot):
             os.remove(f'{name_form}.xlsx')
         if os.path.isfile(f'{name_form}.csv'):
             os.remove(f'{name_form}.csv')
-# TODO Произвести запись в базу даных
 
 
 # Этот хэндлер будет срабатывать на отправку отчетности по размещённым вакансиям
