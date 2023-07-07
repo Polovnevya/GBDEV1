@@ -54,7 +54,6 @@ async def download_document(message: Message, bot: Bot):
         df = pd.read_excel(f'{name_form}.xlsx')
         df.to_csv(f'{name_form}.csv', index=False)
         df = pd.read_csv(f'{name_form}.csv')
-        # vacancy_dict = {}
         for i in range(len(df)):
             await db.insert_vacancy(
                 DAOVacancyData(employer_id=await db.get_employer_id_by_tguser_id(message.from_user.id),
@@ -71,7 +70,6 @@ async def download_document(message: Message, bot: Bot):
                                )
         os.remove(f'{name_form}.csv')
         await message.answer("Файл поступил и обработан.")
-        # return vacancy_dict
     except ValueError:
         await message.answer(f'Вы направили файл иного формата.\n'
                              f'Заполните предоставленную форму и отправьте её в бот.')
