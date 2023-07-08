@@ -24,4 +24,5 @@ async def auto_posting(bot: Bot, db: DAO):
         for channel_id in channels:
             await asyncio.sleep(0.3)
             post_id = await __send_message_2_channel(bot, vacancy, channel_id)
+            print(f"channel_id {channel_id}, message_id{post_id}, vacancy_id {vacancy.id}")
             await db.insert_post(channel_id=channel_id, message_id=post_id, vacancy_id=vacancy.id)

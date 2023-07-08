@@ -1,12 +1,12 @@
+from datetime import datetime
 from decimal import Decimal
 from typing import List
+
 from sqlalchemy import Enum, Float, Boolean, Table, Column
 from sqlalchemy import Integer, String, DateTime, ForeignKey, BigInteger
 from sqlalchemy.ext.asyncio import AsyncAttrs
 from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column, validates
 from sqlalchemy.orm import relationship
-from datetime import datetime
-
 from sqlalchemy_utils import EmailType, PhoneNumberType
 from validate_email import validate_email
 
@@ -26,7 +26,7 @@ class DateBaseModel:
 class ContactBaseModel:
     email: Mapped[EmailType] = mapped_column(EmailType, nullable=False, unique=True)
     phone: Mapped[PhoneNumberType] = mapped_column(
-        PhoneNumberType(region="RU", check_region=True, max_length=12),
+        PhoneNumberType(region="RU", check_region=True, max_length=13),
         nullable=False,
         unique=True,
     )
@@ -43,7 +43,7 @@ class Candidate(Base, DateBaseModel):
 
     id: Mapped[int] = mapped_column(primary_key=True)
     feedback: Mapped[List["Feedback"]] = relationship(lazy="joined")
-    tg_id: Mapped[int] = mapped_column(unique=True, nullable=False)
+    tg_id: Mapped[int] = mapped_column(BigInteger, unique=True, nullable=False)
     first_name: Mapped[str] = mapped_column(String(50), nullable=False)
     middle_name: Mapped[str] = mapped_column(String(50), nullable=True)
     last_name: Mapped[str] = mapped_column(String(50), nullable=False)
@@ -51,7 +51,7 @@ class Candidate(Base, DateBaseModel):
     age: Mapped[Enum] = mapped_column(Enum(AgeCategoriesEnum), nullable=False)
     education: Mapped[Enum] = mapped_column(Enum(EducationEnum), nullable=False)
     phone: Mapped[PhoneNumberType] = mapped_column(
-        PhoneNumberType(region="RU", check_region=True, max_length=13),
+        PhoneNumberType(region="RU", check_region=True, max_length=25),
         nullable=False,
         unique=True,
     )
@@ -83,7 +83,7 @@ class Employer(Base, ContactBaseModel, DateBaseModel):
     id: Mapped[int] = mapped_column(primary_key=True)
     vacancy: Mapped[List["Vacancy"]] = relationship(lazy="joined")
     user_name: Mapped[str] = mapped_column(String(50), unique=True, nullable=False)
-    tg_id: Mapped[int] = mapped_column(unique=True, nullable=False)
+    tg_id: Mapped[int] = mapped_column(BigInteger, unique=True, nullable=False)
     company_name = mapped_column(String(50), nullable=False)
 
     # def __repr__(self):
@@ -109,7 +109,6 @@ class Vacancy(Base, DateBaseModel):
     is_open: Mapped[bool] = mapped_column(Boolean, default=True)
     date_start: Mapped[datetime] = mapped_column(DateTime)
     date_end: Mapped[datetime] = mapped_column(DateTime)
-
 
     # def __repr__(self):
     #     return f"<id: {self.id}, vacancy_name: {self.name}, employer_id: {self.employer_id}, " \

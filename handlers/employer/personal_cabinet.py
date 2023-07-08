@@ -1,18 +1,20 @@
+import datetime
 import os
+
 import pandas as pd
 from aiogram import Router, F, Bot
 from aiogram.enums import ContentType
-from aiogram.fsm.context import FSMContext
 from aiogram.filters import CommandStart, StateFilter
+from aiogram.fsm.context import FSMContext
 from aiogram.types import Message, CallbackQuery, FSInputFile
+
 from config.config import config
+from db.types import DAOVacancyData, WorkScheduleEnum, EmploymentEnum, AudienceEnum
 from filters.employer import IsEmployer
 from keyboards.inline.employer import get_start_employer_keyboard, EmployerLoadCB, EmployerReportingCB
-from states.employer import FSMFormEvent
-from reporting import Reporting
-from db.types import DAOVacancyData, WorkScheduleEnum, EmploymentEnum, AudienceEnum
 from loader import db
-import datetime
+from reporting import Reporting
+from states.employer import FSMFormEvent
 
 employer_pc_router: Router = Router()
 employer_pc_router.message.filter(IsEmployer(config.employers.employers_ids))
@@ -62,13 +64,13 @@ async def download_document(message: Message, bot: Bot):
         if os.path.isfile(f'{name_form}.xlsx'):
             os.remove(f'{name_form}.xlsx')
     except KeyError:
-        await message.answer(f'Вы направили файл содержание котого не соответствует направленной вам форме для заполнения.\n'
-                             f'Заполните предоставленную форму и отправьте её в бот.')
+        await message.answer(
+            f'Вы направили файл содержание котого не соответствует направленной вам форме для заполнения.\n'
+            f'Заполните предоставленную форму и отправьте её в бот.')
         if os.path.isfile(f'{name_form}.xlsx'):
             os.remove(f'{name_form}.xlsx')
         if os.path.isfile(f'{name_form}.csv'):
             os.remove(f'{name_form}.csv')
-
 
     for i in range(len(df)):
         try:
@@ -109,36 +111,35 @@ async def download_document(message: Message, bot: Bot):
                            geolocation='69.333333, 88.333333',
                            is_open=True,
                            date_start=datetime.datetime.now(),
-                           date_end=datetime.datetime.now()+datetime.timedelta(days=10)
+                           date_end=datetime.datetime.now() + datetime.timedelta(days=10)
                            ))
         await message.answer("Файл поступил и обработан.")
-
 
 
 # Этот хэндлер будет срабатывать на отправку отчетности по размещённым вакансиям
 @employer_pc_router.callback_query(EmployerReportingCB.filter())
 async def process_button_2_press(callback: CallbackQuery,
-                                 bot: Bot,):
+                                 bot: Bot, ):
     report = Reporting()
     records = report.get_reporting(f'WITH\n'
                                    f'number_responses AS (\n'
-                                        f'SELECT vacancies.id, COUNT(candidates.id) AS count_responses\n'
-                                        f'FROM employers\n'
-                                        f'JOIN vacancies ON employers.id = vacancies.employer_id\n'
-                                        f'JOIN feedback ON vacancies.id = feedback.vacancy_id\n'
-                                        f'JOIN candidates ON feedback.candidate_id = candidates.id\n'
-                                        f'WHERE employers.tg_id = 3\n'
-                                        f'GROUP BY vacancies.id),\n'
-                                    f'number_posts AS (\n'
-                                        f'SELECT vacancies.id AS id, vacancies.name AS name, COUNT(posts.id) AS count_posts\n'
-                                        f'FROM posts\n'
-                                        f'JOIN vacancies ON posts.vacancy_id = vacancies.id\n'
-                                        f'JOIN employers ON employers.id = vacancies.employer_id\n'
-                                        f'WHERE employers.tg_id = {callback.from_user.id}\n'
-                                        f'GROUP BY vacancies.id)\n'
-                                    f'SELECT number_posts.id, number_posts.name, number_posts.count_posts, number_responses.count_responses\n'
-                                    f'FROM number_posts LEFT OUTER JOIN number_responses ON number_posts.id=number_responses.id;'
-                                    )
+                                   f'SELECT vacancies.id, COUNT(candidates.id) AS count_responses\n'
+                                   f'FROM employers\n'
+                                   f'JOIN vacancies ON employers.id = vacancies.employer_id\n'
+                                   f'JOIN feedback ON vacancies.id = feedback.vacancy_id\n'
+                                   f'JOIN candidates ON feedback.candidate_id = candidates.id\n'
+                                   f'WHERE employers.tg_id = 3\n'
+                                   f'GROUP BY vacancies.id),\n'
+                                   f'number_posts AS (\n'
+                                   f'SELECT vacancies.id AS id, vacancies.name AS name, COUNT(posts.id) AS count_posts\n'
+                                   f'FROM posts\n'
+                                   f'JOIN vacancies ON posts.vacancy_id = vacancies.id\n'
+                                   f'JOIN employers ON employers.id = vacancies.employer_id\n'
+                                   f'WHERE employers.tg_id = {callback.from_user.id}\n'
+                                   f'GROUP BY vacancies.id)\n'
+                                   f'SELECT number_posts.id, number_posts.name, number_posts.count_posts, number_responses.count_responses\n'
+                                   f'FROM number_posts LEFT OUTER JOIN number_responses ON number_posts.id=number_responses.id;'
+                                   )
     list_name_request = [('id',
                           'Наименование вакансии',
                           'Количество опубликованных постов с вакансией',
