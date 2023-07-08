@@ -1,7 +1,7 @@
 from typing import Union
 from sqlalchemy import select
 from ..models import Employer, Vacancy, Post, Feedback
-from ..types import DAOEmployerData, Reporting
+from ..types import DAOEmployerData, ReportingPostsResponses
 
 
 class DAOEmployerMixin:
@@ -29,7 +29,7 @@ class DAOEmployerMixin:
                         tg_id=employer.tg_id,
                     )
 
-    async def get_reporting(self, employer_id: int) -> list[Reporting]:
+    async def get_reporting(self, employer_id: int) -> list[ReportingPostsResponses]:
         """
         возвращает список кортежей.
         в каждом кортеже содержиться информация относительно одной вакансии, а именно:
@@ -59,7 +59,7 @@ class DAOEmployerMixin:
                     posts = posts.unique()
                     responses = feedbacks.unique()
 
-                    reports.append(Reporting(
+                    reports.append(ReportingPostsResponses(
                         vacancy_id=vacancy_id,
                         vacancy_name=vacancy_name,
                         number_posts=len([post for post in posts]),
@@ -73,3 +73,13 @@ class DAOEmployerMixin:
             async with session.begin():
                 employer = await session.scalar(select(Employer).filter_by(tg_id=tg_id))
         return employer.id
+
+
+    async def get_reporting_1(self, employer_id: int) -> list[ReportingPostsResponses]:
+        """
+        возвращает .
+
+        Вакансии которые были удалены, и отклики по ним, не учитываются.
+
+        """
+        return 1

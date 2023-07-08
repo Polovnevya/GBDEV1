@@ -45,7 +45,7 @@ class DAOEmployerData:
     tg_id: str
 
 @dataclass
-class Reporting:
+class ReportingPostsResponses:
     vacancy_id: int
     vacancy_name: str
     number_posts: int
