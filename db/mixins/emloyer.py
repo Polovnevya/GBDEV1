@@ -1,7 +1,7 @@
 from typing import Union
 from sqlalchemy import select
 from ..models import Employer, Vacancy, Post, Feedback
-from ..types import DAOEmployerData, ReportingPostsResponses
+from ..types import DAOEmployerData, ReportingPostsResponses, ReportingGenger, ReportingAge, ReportingEducation, AudienceEnum
 
 
 class DAOEmployerMixin:
@@ -74,12 +74,14 @@ class DAOEmployerMixin:
                 employer = await session.scalar(select(Employer).filter_by(tg_id=tg_id))
         return employer.id
 
-
-    async def get_reporting_1(self, employer_id: int) -> list[ReportingPostsResponses]:
+    async def get_reporting_age(self, employer_id: int) -> list[]:
         """
         возвращает .
 
         Вакансии которые были удалены, и отклики по ним, не учитываются.
 
         """
-        return 1
+        return [(AudienceEnum.IT.value, AudienceEnum.unskilled_workers.value),
+                ((ReportingAge.junior, ReportingAge.middle, ReportingAge.senior),
+                 (ReportingAge.junior, ReportingAge.middle, ReportingAge.senior))
+                 ]
