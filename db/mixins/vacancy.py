@@ -1,7 +1,7 @@
 from typing import List
 from sqlalchemy import select, Enum
 from ..models import Vacancy, Audience
-from ..types import DAOVacancyData, WorkScheduleEnum, EmploymentEnum
+from ..types import DAOVacancyData, WorkScheduleEnum, EmploymentEnum, AudienceEnum
 from geopy.distance import geodesic as GD
 from operator import attrgetter
 
@@ -149,7 +149,7 @@ class DAOVacancyMixin:
                     session.add(Vacancy(**vacancy.__dict__))
                     session.commit()
 
-    async def get_audience_id_by_name(self, name: Enum) -> int:
+    async def get_audience_id_by_name(self, name: AudienceEnum) -> int:
         await self.sql_manager.create_async_session()
         async with self.sql_manager.async_session() as session:
             async with session.begin():
