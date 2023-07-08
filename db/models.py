@@ -43,7 +43,7 @@ class Candidate(Base, DateBaseModel):
 
     id: Mapped[int] = mapped_column(primary_key=True)
     feedback: Mapped[List["Feedback"]] = relationship(lazy="joined")
-    tg_id: Mapped[int] = mapped_column(unique=True, nullable=False)
+    tg_id: Mapped[int] = mapped_column(BigInteger, unique=True, nullable=False)
     first_name: Mapped[str] = mapped_column(String(50), nullable=False)
     middle_name: Mapped[str] = mapped_column(String(50), nullable=True)
     last_name: Mapped[str] = mapped_column(String(50), nullable=False)
