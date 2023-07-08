@@ -6,7 +6,7 @@ from aiogram import Router, F, Bot
 from aiogram.enums import ContentType
 from aiogram.filters import CommandStart, StateFilter
 from aiogram.fsm.context import FSMContext
-from aiogram.types import Message, CallbackQuery, FSInputFile
+from aiogram.types import Message, CallbackQuery, FSInputFile, ReplyKeyboardRemove
 
 from config.config import config
 from db.types import DAOVacancyData, WorkScheduleEnum, EmploymentEnum, AudienceEnum
@@ -35,7 +35,8 @@ async def process_button_load_press(callback: CallbackQuery, state: FSMContext, 
     document = FSInputFile(path='files/work/common/vacancy_template.xlsx')
     await bot.send_document(callback.message.chat.id, document=document)
     await callback.message.answer(
-        text=f'Скачайте форму.\nЗаполните и направьте форму в бот для размещения вакансии.\n')
+        text=f'Скачайте форму.\nЗаполните и направьте форму в бот для размещения вакансии.\n',
+        reply_markup=ReplyKeyboardRemove())
     await callback.answer()
     await state.set_state(FSMFormEvent.lreporting)
 
@@ -63,6 +64,7 @@ async def download_document(message: Message, bot: Bot):
                              f'Заполните предоставленную форму и отправьте её в бот.')
         if os.path.isfile(f'{name_form}.xlsx'):
             os.remove(f'{name_form}.xlsx')
+        df = []
     except KeyError:
         await message.answer(
             f'Вы направили файл содержание котого не соответствует направленной вам форме для заполнения.\n'
@@ -72,36 +74,54 @@ async def download_document(message: Message, bot: Bot):
         if os.path.isfile(f'{name_form}.csv'):
             os.remove(f'{name_form}.csv')
 
+    validated_vacancy = []
+
     for i in range(len(df)):
         try:
             audience_id = await db.get_audience_id_by_name(AudienceEnum(df.loc[i, 'специализация']))
-        except ValueError:
-            await message.answer(f'В вакансии {df.loc[i, "должность"]} ошибка в столбце "Cпециализация"!\n'
-                                 f'Заполните предоставленную форму в соответствии с требованиями и отправьте её в бот.')
+        except KeyError:
+            await message.answer(f'В вакансии на строке №{i + 1} ошибка в столбце "специализация"!\n'
+                                 f'Заполните предоставленную форму в соответствии с требованиями и отправьте её в бот.\n')
+            if os.path.isfile(f'{name_form}.xlsx'):
+                os.remove(f'{name_form}.xlsx')
+            if os.path.isfile(f'{name_form}.csv'):
+                os.remove(f'{name_form}.csv')
             break
 
         try:
             work_schedule = WorkScheduleEnum(df.loc[i, 'график работы'])
-        except ValueError:
-            await message.answer(f'В вакансии {df.loc[i, "должность"]} ошибка в столбце "График работы"!\n'
+        except KeyError:
+            await message.answer(f'В вакансии на строке №{i + 1} ошибка в столбце "График работы"!\n'
                                  f'Заполните предоставленную форму в соответствии с требованиями и отправьте её в бот.\n')
-            break
+            if os.path.isfile(f'{name_form}.xlsx'):
+                os.remove(f'{name_form}.xlsx')
+            if os.path.isfile(f'{name_form}.csv'):
+                os.remove(f'{name_form}.csv')
 
         try:
             employment = EmploymentEnum(df.loc[i, 'тип занятости'])
-        except ValueError:
-            await message.answer(f'В вакансии {df.loc[i, "должность"]} ошибка в столбце "Тип занятости"!\n'
-                                 f'Заполните предоставленную форму в соответствии с требованиями и отправьте её в бот.')
+        except KeyError:
+            await message.answer(f'В вакансии на строке №{i + 1} ошибка в столбце "тип занятости"!\n'
+                                 f'Заполните предоставленную форму в соответствии с требованиями и отправьте её в бот.\n')
+            if os.path.isfile(f'{name_form}.xlsx'):
+                os.remove(f'{name_form}.xlsx')
+            if os.path.isfile(f'{name_form}.csv'):
+                os.remove(f'{name_form}.csv')
             break
 
         try:
             salary = float(df.loc[i, 'размер заработной платы: руб.'])
-        except ValueError:
-            await message.answer(f'В вакансии {df.loc[i, "должность"]} ошибка в столбце "Размер заработной платы"!\n'
-                                 f'Заполните предоставленную форму в соответствии с требованиями и отправьте её в бот.')
+        except KeyError:
+            await message.answer(
+                f'В вакансии на строке №{i + 1} ошибка в столбце "размер заработной платы: руб."!\n'
+                f'Заполните предоставленную форму в соответствии с требованиями и отправьте её в бот.\n')
+            if os.path.isfile(f'{name_form}.xlsx'):
+                os.remove(f'{name_form}.xlsx')
+            if os.path.isfile(f'{name_form}.csv'):
+                os.remove(f'{name_form}.csv')
             break
 
-        await db.insert_vacancy(
+        validated_vacancy.append(
             DAOVacancyData(employer_id=await db.get_employer_id_by_tguser_id(message.from_user.id),
                            audience_id=audience_id,
                            name=df.loc[i, 'должность'],
@@ -113,7 +133,10 @@ async def download_document(message: Message, bot: Bot):
                            date_start=datetime.datetime.now(),
                            date_end=datetime.datetime.now() + datetime.timedelta(days=10)
                            ))
-        await message.answer("Файл поступил и обработан.")
+
+    for vacancy in validated_vacancy:
+        await db.insert_vacancy(vacancy)
+    await message.answer("Файл поступил и обработан.")
 
 
 # Этот хэндлер будет срабатывать на отправку отчетности по размещённым вакансиям

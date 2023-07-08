@@ -28,7 +28,7 @@ fixtures = {
     "employer": [
         {
             "user_name": "@GoodCompany",
-            "tg_id": 3,
+            "tg_id": 618432846,
             "company_name": "хорошая компания",
             "email": "goodcompany@email.ru",
             "phone": "9333333333",
@@ -80,7 +80,7 @@ fixtures = {
             "date_end": datetime(2023, 7, 4, 18, 42, 13, 933058),
         },
         {
-            "name": "пинатель хуёв",
+            "name": "бездельник на окладе",
             "employer_id": 2,
             "audience_id": 2,
             "work_schedule": WorkScheduleEnum.flexible,
