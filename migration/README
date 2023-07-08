@@ -1,0 +1,9 @@
+Generic single-database configuration with an async dbapi.
+Выполняем первую миграцию:
+alembic revision --autogenerate -m "Comment"
+
+Example: alembic revision --autogenerate -m "Первый коммит"
+
+Применяем миграцию:
+alembic upgrade head
+
