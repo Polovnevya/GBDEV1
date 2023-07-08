@@ -52,6 +52,26 @@ class ReportingPostsResponses:
     number_responses: int
 
 
+@dataclass
+class ReportingGenger:
+    male: int
+    female: str
+
+
+@dataclass
+class ReportingAge:
+    junior: int
+    middle: int
+    senior: int
+
+
+@dataclass
+class ReportingEducation:
+    secondary: int
+    vocational: int
+    higher: int
+
+
 # enums
 
 class EmploymentEnum(enum.Enum):
