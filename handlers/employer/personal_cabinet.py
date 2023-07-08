@@ -9,7 +9,6 @@ from config.config import config
 from filters.employer import IsEmployer
 from keyboards.inline.employer import get_start_employer_keyboard, EmployerLoadCB, EmployerReportingCB
 from states.employer import FSMFormEvent
-from reporting import Reporting
 from db.types import DAOVacancyData, WorkScheduleEnum, EmploymentEnum, AudienceEnum
 from loader import db
 import datetime
