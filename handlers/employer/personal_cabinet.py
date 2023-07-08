@@ -119,7 +119,7 @@ async def download_document(message: Message, bot: Bot):
 @employer_pc_router.callback_query(EmployerReportingCB.filter())
 async def process_button_2_press(callback: CallbackQuery,
                                  bot: Bot,):
-    report = Reporting()
+    '''report = Reporting()
     records = report.get_reporting(f'WITH\n'
                                    f'number_responses AS (\n'
                                         f'SELECT vacancies.id, COUNT(candidates.id) AS count_responses\n'
@@ -138,12 +138,14 @@ async def process_button_2_press(callback: CallbackQuery,
                                         f'GROUP BY vacancies.id)\n'
                                     f'SELECT number_posts.id, number_posts.name, number_posts.count_posts, number_responses.count_responses\n'
                                     f'FROM number_posts LEFT OUTER JOIN number_responses ON number_posts.id=number_responses.id;'
-                                    )
+                                    )'''
+    records = await db.get_reporting(await db.get_employer_id_by_tguser_id(callback.from_user.id))
+    print(records)
     list_name_request = [('id',
                           'Наименование вакансии',
                           'Количество опубликованных постов с вакансией',
                           'Количество откликов на вакансию',)]
-    list_name_request.extend(records)
+    #list_name_request.extend(records)
 
     path_file_to_reporting = f'files/work/unloading/{callback.from_user.id}'
     if not os.path.exists(path_file_to_reporting):
@@ -151,6 +153,7 @@ async def process_button_2_press(callback: CallbackQuery,
     for i in range(len(list_name_request)):
         with open(f'{path_file_to_reporting}/reporting.csv', 'a+', encoding="utf-8") as f:
             f.write(f'{",".join(map(str, list_name_request[i]))}\n')
+            
     df = pd.read_csv(f'{path_file_to_reporting}/reporting.csv')
     df.to_excel(f'{path_file_to_reporting}/Отчёт.xlsx', engine='openpyxl')
     document = FSInputFile(path=f'{path_file_to_reporting}/Отчёт.xlsx')
