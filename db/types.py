@@ -53,7 +53,7 @@ class ReportingPostsResponses:
 
 
 @dataclass
-class ReportigVacancy:
+class ReportingVacancy:
     vacancy_id: int
     vacancy_name: str
     male: int
