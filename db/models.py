@@ -26,7 +26,7 @@ class DateBaseModel:
 class ContactBaseModel:
     email: Mapped[EmailType] = mapped_column(EmailType, nullable=False, unique=True)
     phone: Mapped[PhoneNumberType] = mapped_column(
-        PhoneNumberType(region="RU", check_region=True, max_length=13),
+        PhoneNumberType(region="RU", check_region=True, max_length=12),
         nullable=False,
         unique=True,
     )

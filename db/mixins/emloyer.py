@@ -1,7 +1,8 @@
 from typing import Union, List
 from sqlalchemy import select
-from ..models import Employer, Vacancy, Post, Feedback
-from ..types import DAOEmployerData, ReportingPostsResponses, ReportingVacancy
+from ..models import Employer, Vacancy, Post, Feedback, Candidate
+from ..types import DAOEmployerData, ReportingPostsResponses, ReportingVacancy, GenderEnum, AgeCategoriesEnum, \
+    EducationEnum
 
 
 class DAOEmployerMixin:
@@ -92,15 +93,80 @@ class DAOEmployerMixin:
         Вакансии которые были удалены, и отклики по ним, не учитываются.
 
         """
-        ReportingVacancy.vacancy_id = 3,
-        ReportingVacancy.vacancy_name = 'Вакансия тест',
-        ReportingVacancy.male = 10,
-        ReportingVacancy.female = 5,
-        ReportingVacancy.junior = 7,
-        ReportingVacancy.middle = 3,
-        ReportingVacancy.senior = 2,
-        ReportingVacancy.secondary = 2,
-        ReportingVacancy.vocational = 5,
-        ReportingVacancy.higher = 5
 
-        return [ReportingVacancy]
+        reports = []
+
+        await self.sql_manager.create_async_session()
+        async with self.sql_manager.async_session() as session:
+            async with session.begin():
+                vacancy_stmt = select(Vacancy).where(Vacancy.employer_id == employer_id).where(
+                    Vacancy.deleted_at is not None)
+                vacancies = await session.scalars(vacancy_stmt)
+
+                for vacancy in vacancies.unique():
+                    vacancy_id = vacancy.id
+                    vacancy_name = vacancy.name
+                    feedback_stmt = select(Feedback).where(Feedback.vacancy_id == vacancy.id)
+                    feedback_by_male_stmt = select(Feedback).where(Feedback.vacancy_id == vacancy.id).join(
+                        Candidate).where(Candidate.gender == GenderEnum.male)
+                    feedback_by_female_stmt = select(Feedback).where(Feedback.vacancy_id == vacancy.id).join(
+                        Candidate).where(Candidate.gender == GenderEnum.female)
+                    feedback_by_junior_stmt = select(Feedback).where(Feedback.vacancy_id == vacancy.id).join(
+                        Candidate).where(Candidate.age == AgeCategoriesEnum.junior)
+                    feedback_by_middle_stmt = select(Feedback).where(Feedback.vacancy_id == vacancy.id).join(
+                        Candidate).where(Candidate.age == AgeCategoriesEnum.middle)
+                    feedback_by_senior_stmt = select(Feedback).where(Feedback.vacancy_id == vacancy.id).join(
+                        Candidate).where(Candidate.age == AgeCategoriesEnum.senior)
+                    feedback_by_secondary_stmt = select(Feedback).where(Feedback.vacancy_id == vacancy.id).join(
+                        Candidate).where(Candidate.education == EducationEnum.secondary)
+                    feedback_by_vocational_stmt = select(Feedback).where(Feedback.vacancy_id == vacancy.id).join(
+                        Candidate).where(Candidate.education == EducationEnum.vocational)
+                    feedback_by_higher_stmt = select(Feedback).where(Feedback.vacancy_id == vacancy.id).join(
+                        Candidate).where(Candidate.education == EducationEnum.higher)
+
+                    feedbacks = await session.scalars(feedback_stmt)
+                    male = await session.scalars(feedback_by_male_stmt)
+                    female = await session.scalars(feedback_by_female_stmt)
+                    junior = await session.scalars(feedback_by_junior_stmt)
+                    middle = await session.scalars(feedback_by_middle_stmt)
+                    senior = await session.scalars(feedback_by_senior_stmt)
+                    secondary = await session.scalars(feedback_by_secondary_stmt)
+                    vocational = await session.scalars(feedback_by_vocational_stmt)
+                    higher = await session.scalars(feedback_by_higher_stmt)
+
+                    feedbacks = feedbacks.first()
+                    male = male.unique()
+                    female = female.unique()
+                    junior = junior.unique()
+                    middle = middle.unique()
+                    senior = senior.unique()
+                    secondary = secondary.unique()
+                    vocational = vocational.unique()
+                    higher = higher.unique()
+
+                    if feedbacks:
+                        reports.append(ReportingVacancy(
+                            vacancy_id=vacancy_id,
+                            vacancy_name=vacancy_name,
+                            male=len([_ for _ in male]),
+                            female=len([_ for _ in female]),
+                            junior=len([_ for _ in junior]),
+                            middle=len([_ for _ in middle]),
+                            senior=len([_ for _ in senior]),
+                            secondary=len([_ for _ in secondary]),
+                            vocational=len([_ for _ in vocational]),
+                            higher=len([_ for _ in higher])
+                        ))
+        return reports
+
+        # ReportingVacancy.vacancy_id = 3,
+        # ReportingVacancy.vacancy_name = 'Вакансия тест',
+        # ReportingVacancy.male = 10,
+        # ReportingVacancy.female = 5,
+        # ReportingVacancy.junior = 7,
+        # ReportingVacancy.middle = 3,
+        # ReportingVacancy.senior = 2,
+        # ReportingVacancy.secondary = 2,
+        # ReportingVacancy.vocational = 5,
+        # ReportingVacancy.higher = 5
+
