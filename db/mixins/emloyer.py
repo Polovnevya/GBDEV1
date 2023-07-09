@@ -1,4 +1,4 @@
-from typing import Union
+from typing import Union, List
 from sqlalchemy import select
 from ..models import Employer, Vacancy, Post, Feedback
 from ..types import DAOEmployerData, ReportingPostsResponses, ReportingVacancy
@@ -29,7 +29,7 @@ class DAOEmployerMixin:
                         tg_id=employer.tg_id,
                     )
 
-    async def get_reporting(self, employer_id: int) -> list[ReportingPostsResponses]:
+    async def get_reporting(self, employer_id: int) -> List[ReportingPostsResponses]:
         """
         возвращает список кортежей.
         в каждом кортеже содержиться информация относительно одной вакансии, а именно:

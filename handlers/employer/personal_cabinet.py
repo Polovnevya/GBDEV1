@@ -1,5 +1,6 @@
 import datetime
 import os
+from typing import List
 
 import pandas as pd
 from aiogram import Router, F, Bot
@@ -9,7 +10,7 @@ from aiogram.fsm.context import FSMContext
 from aiogram.types import Message, CallbackQuery, FSInputFile, ReplyKeyboardRemove
 
 from config.config import config
-from db.types import DAOVacancyData, WorkScheduleEnum, EmploymentEnum, AudienceEnum
+from db.types import DAOVacancyData, WorkScheduleEnum, EmploymentEnum, AudienceEnum, ReportingPostsResponses
 from filters.employer import IsEmployer
 from keyboards.inline.employer import get_start_employer_keyboard, EmployerLoadCB, EmployerReportingCB
 from states.employer import FSMFormEvent
@@ -139,23 +140,25 @@ async def download_document(message: Message, bot: Bot):
         await db.insert_vacancy(vacancy)
     await message.answer("Файл поступил и обработан.")
 
+
 # Этот хэндлер будет срабатывать на отправку отчетности по размещённым вакансиям
 # количество опубликованных постов с вакансией и отклики на вакансию
 @employer_pc_router.callback_query(EmployerReportingCB.filter())
 async def process_button_2_press(callback: CallbackQuery,
-                                 bot: Bot,):
-    records = await db.get_reporting(await db.get_employer_id_by_tguser_id(callback.from_user.id))
+                                 bot: Bot, ):
+    records: List[ReportingPostsResponses] = await db.get_reporting(
+        await db.get_employer_id_by_tguser_id(callback.from_user.id))
     list_name_request = [('id',
                           'Наименование вакансии',
                           'Количество опубликованных постов с вакансией',
                           'Количество откликов на вакансию',)
-                          ]
+                         ]
     for i in range(len(records)):
         list_name_request.append((records[i].vacancy_id,
                                   records[i].vacancy_name,
                                   records[i].number_posts,
                                   records[i].number_responses)
-                                  )
+                                 )
     path_file_to_reporting = f'files/work/unloading/{callback.from_user.id}'
     if not os.path.exists(path_file_to_reporting):
         os.mkdir(path_file_to_reporting)
