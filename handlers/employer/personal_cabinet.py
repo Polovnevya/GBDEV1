@@ -11,7 +11,7 @@ from aiogram.types import Message, CallbackQuery, FSInputFile, ReplyKeyboardRemo
 
 from config.config import config
 from db.types import DAOVacancyData, WorkScheduleEnum, EmploymentEnum, AudienceEnum
-from db.types import ReportingPostsResponses
+from db.types import ReportingPostsResponses, ReportingVacancy
 from filters.employer import IsEmployer
 from keyboards.inline.employer import get_start_employer_keyboard, EmployerLoadCB, EmployerReportingCB
 from loader import db
@@ -145,31 +145,71 @@ async def download_document(message: Message, bot: Bot):
 @employer_pc_router.callback_query(EmployerReportingCB.filter())
 async def process_button_2_press(callback: CallbackQuery,
                                  bot: Bot, ):
-    records: List[ReportingPostsResponses] = await db.get_reporting(
+    records1: List[ReportingPostsResponses] = await db.get_reporting(
         await db.get_employer_id_by_tguser_id(callback.from_user.id))
-    list_name_request = [('id',
-                          'Наименование вакансии',
-                          'Количество опубликованных постов с вакансией',
-                          'Количество откликов на вакансию',)
-                         ]
-    for i in range(len(records)):
-        list_name_request.append((records[i].vacancy_id,
-                                  records[i].vacancy_name,
-                                  records[i].number_posts,
-                                  records[i].number_responses)
-                                 )
+    records2: List[ReportingVacancy] = await db.get_reporting_response_vacancy(
+        await db.get_employer_id_by_tguser_id(callback.from_user.id))
+    list_name_request1 = [('id',
+                           'Наименование вакансии',
+                           'Количество опубликованных постов с вакансией',
+                           'Количество откликов на вакансию',)
+                          ]
+    list_name_request2 = [('id',
+                           'Наименование вакансии',
+                           'Количество откликов со стороны мужчин',
+                           'Количество откликов со стороны женщин',
+                           'Количество откликов кандидатов категории junior',
+                           'Количество откликов кандидатов категории middle',
+                           'Количество откликов кандидатов категории senior',
+                           'Количество откликов кандидатов со средним образованием',
+                           'Количество откликов кандидатов со средним профессиональным образованием',
+                           'Kоличество откликов кандидатов с высшим образованием')
+                          ]
+    for i in range(len(records1)):
+        list_name_request1.append((records1[i].vacancy_id,
+                                   records1[i].vacancy_name,
+                                   records1[i].number_posts,
+                                   records1[i].number_responses)
+                                  )
+
+    for i in range(len(records2)):
+        list_name_request2.append((records2[i].vacancy_id,
+                                   records2[i].vacancy_name,
+                                   records2[i].male,
+                                   records2[i].female,
+                                   records2[i].junior,
+                                   records2[i].middle,
+                                   records2[i].senior,
+                                   records2[i].secondary,
+                                   records2[i].vocational,
+                                   records2[i].higher)
+                                  )
+
     path_file_to_reporting = f'files/work/unloading/{callback.from_user.id}'
     if not os.path.exists(path_file_to_reporting):
         os.mkdir(path_file_to_reporting)
-    for i in range(len(list_name_request)):
-        with open(f'{path_file_to_reporting}/reporting.csv', 'a+', encoding="utf-8") as f:
-            f.write(f'{",".join(map(str, list_name_request[i]))}\n')
+    for i in range(len(list_name_request1)):
+        with open(f'{path_file_to_reporting}/reporting1.csv', 'a+', encoding="utf-8") as f:
+            f.write(f'{",".join(map(str, list_name_request1[i]))}\n')
+    for i in range(len(list_name_request2)):
+        with open(f'{path_file_to_reporting}/reporting2.csv', 'a+', encoding="utf-8") as f:
+            f.write(f'{",".join(map(str, list_name_request2[i]))}\n')
 
-    df = pd.read_csv(f'{path_file_to_reporting}/reporting.csv')
-    df.to_excel(f'{path_file_to_reporting}/Отчёт.xlsx', engine='openpyxl')
+    df = pd.read_csv(f'{path_file_to_reporting}/reporting1.csv')
+    df.to_excel(f'{path_file_to_reporting}/Отчёт.xlsx',
+                engine='openpyxl',
+                index=False,
+                sheet_name='Отчёт №1')
+    df = pd.read_csv(f'{path_file_to_reporting}/reporting2.csv')
+    with pd.ExcelWriter(f'{path_file_to_reporting}/Отчёт.xlsx',
+                        mode="a",
+                        engine="openpyxl") as writer:
+        df.to_excel(writer, index=False, sheet_name='Отчёт №2')
+
     document = FSInputFile(path=f'{path_file_to_reporting}/Отчёт.xlsx')
     await callback.message.answer(text='Отчет сформирован.')
     await bot.send_document(callback.message.chat.id, document=document)
-    with open(f'{path_file_to_reporting}/reporting.csv', 'w') as f:
+    with open(f'{path_file_to_reporting}/reporting1.csv', 'w') as f:
         pass
-
+    with open(f'{path_file_to_reporting}/reporting2.csv', 'w') as f:
+        pass
