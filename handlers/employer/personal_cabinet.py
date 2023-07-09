@@ -10,11 +10,10 @@ from aiogram.fsm.context import FSMContext
 from aiogram.types import Message, CallbackQuery, FSInputFile, ReplyKeyboardRemove
 
 from config.config import config
-from db.types import DAOVacancyData, WorkScheduleEnum, EmploymentEnum, AudienceEnum, ReportingPostsResponses
+from db.types import DAOVacancyData, WorkScheduleEnum, EmploymentEnum, AudienceEnum
+from db.types import ReportingPostsResponses
 from filters.employer import IsEmployer
 from keyboards.inline.employer import get_start_employer_keyboard, EmployerLoadCB, EmployerReportingCB
-from states.employer import FSMFormEvent
-from db.types import DAOVacancyData, WorkScheduleEnum, EmploymentEnum, AudienceEnum
 from loader import db
 from states.employer import FSMFormEvent
 

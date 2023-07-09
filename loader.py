@@ -24,7 +24,7 @@ dp: Dispatcher = Dispatcher()
 scheduler: AsyncIOScheduler = AsyncIOScheduler(timezone="Europe/Moscow")
 scheduler.add_job(utils.appsched.auto_posting,
                   trigger='interval',
-                  seconds=600,
+                  seconds=1500,
                   kwargs={'bot': bot,
                           'db': db})
 
