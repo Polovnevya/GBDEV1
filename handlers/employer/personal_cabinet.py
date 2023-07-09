@@ -12,8 +12,9 @@ from config.config import config
 from db.types import DAOVacancyData, WorkScheduleEnum, EmploymentEnum, AudienceEnum
 from filters.employer import IsEmployer
 from keyboards.inline.employer import get_start_employer_keyboard, EmployerLoadCB, EmployerReportingCB
+from states.employer import FSMFormEvent
+from db.types import DAOVacancyData, WorkScheduleEnum, EmploymentEnum, AudienceEnum
 from loader import db
-from reporting import Reporting
 from states.employer import FSMFormEvent
 
 employer_pc_router: Router = Router()
@@ -138,43 +139,30 @@ async def download_document(message: Message, bot: Bot):
         await db.insert_vacancy(vacancy)
     await message.answer("Файл поступил и обработан.")
 
-
 # Этот хэндлер будет срабатывать на отправку отчетности по размещённым вакансиям
+# количество опубликованных постов с вакансией и отклики на вакансию
 @employer_pc_router.callback_query(EmployerReportingCB.filter())
 async def process_button_2_press(callback: CallbackQuery,
-                                 bot: Bot, ):
-    report = Reporting()
-    records = report.get_reporting(f'WITH\n'
-                                   f'number_responses AS (\n'
-                                   f'SELECT vacancies.id, COUNT(candidates.id) AS count_responses\n'
-                                   f'FROM employers\n'
-                                   f'JOIN vacancies ON employers.id = vacancies.employer_id\n'
-                                   f'JOIN feedback ON vacancies.id = feedback.vacancy_id\n'
-                                   f'JOIN candidates ON feedback.candidate_id = candidates.id\n'
-                                   f'WHERE employers.tg_id = 3\n'
-                                   f'GROUP BY vacancies.id),\n'
-                                   f'number_posts AS (\n'
-                                   f'SELECT vacancies.id AS id, vacancies.name AS name, COUNT(posts.id) AS count_posts\n'
-                                   f'FROM posts\n'
-                                   f'JOIN vacancies ON posts.vacancy_id = vacancies.id\n'
-                                   f'JOIN employers ON employers.id = vacancies.employer_id\n'
-                                   f'WHERE employers.tg_id = {callback.from_user.id}\n'
-                                   f'GROUP BY vacancies.id)\n'
-                                   f'SELECT number_posts.id, number_posts.name, number_posts.count_posts, number_responses.count_responses\n'
-                                   f'FROM number_posts LEFT OUTER JOIN number_responses ON number_posts.id=number_responses.id;'
-                                   )
+                                 bot: Bot,):
+    records = await db.get_reporting(await db.get_employer_id_by_tguser_id(callback.from_user.id))
     list_name_request = [('id',
                           'Наименование вакансии',
                           'Количество опубликованных постов с вакансией',
-                          'Количество откликов на вакансию',)]
-    list_name_request.extend(records)
-
+                          'Количество откликов на вакансию',)
+                          ]
+    for i in range(len(records)):
+        list_name_request.append((records[i].vacancy_id,
+                                  records[i].vacancy_name,
+                                  records[i].number_posts,
+                                  records[i].number_responses)
+                                  )
     path_file_to_reporting = f'files/work/unloading/{callback.from_user.id}'
     if not os.path.exists(path_file_to_reporting):
         os.mkdir(path_file_to_reporting)
     for i in range(len(list_name_request)):
         with open(f'{path_file_to_reporting}/reporting.csv', 'a+', encoding="utf-8") as f:
             f.write(f'{",".join(map(str, list_name_request[i]))}\n')
+
     df = pd.read_csv(f'{path_file_to_reporting}/reporting.csv')
     df.to_excel(f'{path_file_to_reporting}/Отчёт.xlsx', engine='openpyxl')
     document = FSInputFile(path=f'{path_file_to_reporting}/Отчёт.xlsx')

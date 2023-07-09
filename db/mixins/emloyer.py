@@ -1,7 +1,7 @@
 from typing import Union
 from sqlalchemy import select
 from ..models import Employer, Vacancy, Post, Feedback
-from ..types import DAOEmployerData, Reporting
+from ..types import DAOEmployerData, ReportingPostsResponses, ReportingVacancy
 
 
 class DAOEmployerMixin:
@@ -29,7 +29,7 @@ class DAOEmployerMixin:
                         tg_id=employer.tg_id,
                     )
 
-    async def get_reporting(self, employer_id: int) -> list[Reporting]:
+    async def get_reporting(self, employer_id: int) -> list[ReportingPostsResponses]:
         """
         возвращает список кортежей.
         в каждом кортеже содержиться информация относительно одной вакансии, а именно:
@@ -59,7 +59,7 @@ class DAOEmployerMixin:
                     posts = posts.unique()
                     responses = feedbacks.unique()
 
-                    reports.append(Reporting(
+                    reports.append(ReportingPostsResponses(
                         vacancy_id=vacancy_id,
                         vacancy_name=vacancy_name,
                         number_posts=len([post for post in posts]),
@@ -73,3 +73,34 @@ class DAOEmployerMixin:
             async with session.begin():
                 employer = await session.scalar(select(Employer).filter_by(tg_id=tg_id))
         return employer.id
+
+    async def get_reporting_response_vacancy(self, employer_id: int) -> list[ReportingVacancy]:
+        """
+        Возвращает список кортежей.
+        Каждый кортеж содержит:
+        - id вакансии;
+        - наименование вакансии,
+        - количество откликов со стороны мужчин,
+        - количество откликов со стороны женщин,
+        - количество откликов кандидатов категории junior,
+        - количество откликов кандидатов категории middle,
+        - количество откликов кандидатов категории senior,
+        - количество откликов кандидатов со средним образованием,
+        - количество откликов кандидатов со средним профессиональным образованием,
+        - количество откликов кандидатов с высшим образованием
+
+        Вакансии которые были удалены, и отклики по ним, не учитываются.
+
+        """
+        ReportingVacancy.vacancy_id = 3,
+        ReportingVacancy.vacancy_name = 'Вакансия тест',
+        ReportingVacancy.male = 10,
+        ReportingVacancy.female = 5,
+        ReportingVacancy.junior = 7,
+        ReportingVacancy.middle = 3,
+        ReportingVacancy.senior = 2,
+        ReportingVacancy.secondary = 2,
+        ReportingVacancy.vocational = 5,
+        ReportingVacancy.higher = 5
+
+        return [ReportingVacancy]

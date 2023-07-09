@@ -45,11 +45,25 @@ class DAOEmployerData:
     tg_id: str
 
 @dataclass
-class Reporting:
+class ReportingPostsResponses:
     vacancy_id: int
     vacancy_name: str
     number_posts: int
     number_responses: int
+
+
+@dataclass
+class ReportingVacancy:
+    vacancy_id: int
+    vacancy_name: str
+    male: int
+    female: int
+    junior: int
+    middle: int
+    senior: int
+    secondary: int
+    vocational: int
+    higher: int
 
 
 # enums
