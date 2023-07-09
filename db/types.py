@@ -53,20 +53,14 @@ class ReportingPostsResponses:
 
 
 @dataclass
-class ReportingGenger:
+class ReportigVacancy:
+    vacancy_id: int
+    vacancy_name: str
     male: int
-    female: str
-
-
-@dataclass
-class ReportingAge:
+    female: int
     junior: int
     middle: int
     senior: int
-
-
-@dataclass
-class ReportingEducation:
     secondary: int
     vocational: int
     higher: int
