@@ -174,8 +174,3 @@ async def process_button_2_press(callback: CallbackQuery,
     with open(f'{path_file_to_reporting}/reporting.csv', 'w') as f:
         pass
 
-
-@employer_pc_router.message()
-@employer_pc_router.callback_query()
-async def process_start_command(message: Message):
-    await message.answer("Вы что то делаете не так, перезапустите бот и попробуйте еще раз")

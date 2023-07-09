@@ -84,8 +84,8 @@ class WorkScheduleEnum(enum.Enum):
 
 
 class GenderEnum(enum.Enum):
-    male = "жен."
-    female = "муж."
+    male = "муж."
+    female = "жен."
 
 
 class EducationEnum(enum.Enum):
