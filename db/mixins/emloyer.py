@@ -1,7 +1,7 @@
 from typing import Union
 from sqlalchemy import select
 from ..models import Employer, Vacancy, Post, Feedback
-from ..types import DAOEmployerData, ReportingPostsResponses, ReportingGenger, ReportingAge, ReportingEducation, AudienceEnum
+from ..types import DAOEmployerData, ReportingPostsResponses, ReportingVacancy
 
 
 class DAOEmployerMixin:
@@ -74,14 +74,33 @@ class DAOEmployerMixin:
                 employer = await session.scalar(select(Employer).filter_by(tg_id=tg_id))
         return employer.id
 
-    async def get_reporting_age(self, employer_id: int) -> list[]:
+    async def get_reporting_response_vacancy(self, employer_id: int) -> list[ReportingVacancy]:
         """
-        возвращает .
+        Возвращает список кортежей.
+        Каждый кортеж содержит:
+        - id вакансии;
+        - наименование вакансии,
+        - количество откликов со стороны мужчин,
+        - количество откликов со стороны женщин,
+        - количество откликов кандидатов категории junior,
+        - количество откликов кандидатов категории middle,
+        - количество откликов кандидатов категории senior,
+        - количество откликов кандидатов со средним образованием,
+        - количество откликов кандидатов со средним профессиональным образованием,
+        - количество откликов кандидатов с высшим образованием
 
         Вакансии которые были удалены, и отклики по ним, не учитываются.
 
         """
-        return [(AudienceEnum.IT.value, AudienceEnum.unskilled_workers.value),
-                ((ReportingAge.junior, ReportingAge.middle, ReportingAge.senior),
-                 (ReportingAge.junior, ReportingAge.middle, ReportingAge.senior))
-                 ]
+        ReportingVacancy.vacancy_id = 3,
+        ReportingVacancy.vacancy_name = 'Вакансия тест',
+        ReportingVacancy.male = 10,
+        ReportingVacancy.female = 5,
+        ReportingVacancy.junior = 7,
+        ReportingVacancy.middle = 3,
+        ReportingVacancy.senior = 2,
+        ReportingVacancy.secondary = 2,
+        ReportingVacancy.vocational = 5,
+        ReportingVacancy.higher = 5
+
+        return [ReportingVacancy]
