@@ -47,11 +47,11 @@ async def process_button_load_press(callback: CallbackQuery, state: FSMContext, 
 @employer_pc_router.message(F.content_type == ContentType.DOCUMENT,
                             StateFilter(FSMFormEvent.lreporting))
 async def download_document(message: Message, bot: Bot):
-    if not os.path.exists(f"files/downloads/{message.from_user.id}"):
-        os.mkdir(f"files/downloads/{message.from_user.id}")
-    if not os.path.exists(f"files/downloads/{message.from_user.id}/{message.date.strftime('%Y-%m-%d')}"):
-        os.mkdir(f"files/downloads/{message.from_user.id}/{message.date.strftime('%Y-%m-%d')}")
-    name_form = f"files/downloads/{message.from_user.id}/{message.date.strftime('%Y-%m-%d')}/{message.document.file_id}"
+    if not os.path.exists(f'files/downloads/{message.from_user.id}'):
+        os.mkdir(f'files/downloads/{message.from_user.id}')
+    if not os.path.exists(f'files/downloads/{message.from_user.id}/{message.date.strftime("%Y-%m-%d")}'):
+        os.mkdir(f'files/downloads/{message.from_user.id}/{message.date.strftime("%Y-%m-%d")}')
+    name_form = f'files/downloads/{message.from_user.id}/{message.date.strftime("%Y-%m-%d")}/{message.document.file_id}'
     await bot.download(
         message.document,
         destination=f'{name_form}.xlsx')
@@ -81,39 +81,40 @@ async def download_document(message: Message, bot: Bot):
     for i in range(len(df)):
         try:
             audience_id = await db.get_audience_id_by_name(AudienceEnum(df.loc[i, 'специализация']))
-        except KeyError:
+        except (KeyError, ValueError):
             await message.answer(f'В вакансии на строке №{i + 1} ошибка в столбце "специализация"!\n'
                                  f'Заполните предоставленную форму в соответствии с требованиями и отправьте её в бот.\n')
             if os.path.isfile(f'{name_form}.xlsx'):
                 os.remove(f'{name_form}.xlsx')
             if os.path.isfile(f'{name_form}.csv'):
                 os.remove(f'{name_form}.csv')
-            break
+            continue
 
         try:
             work_schedule = WorkScheduleEnum(df.loc[i, 'график работы'])
-        except KeyError:
+        except (KeyError, ValueError):
             await message.answer(f'В вакансии на строке №{i + 1} ошибка в столбце "График работы"!\n'
                                  f'Заполните предоставленную форму в соответствии с требованиями и отправьте её в бот.\n')
             if os.path.isfile(f'{name_form}.xlsx'):
                 os.remove(f'{name_form}.xlsx')
             if os.path.isfile(f'{name_form}.csv'):
                 os.remove(f'{name_form}.csv')
+            continue
 
         try:
             employment = EmploymentEnum(df.loc[i, 'тип занятости'])
-        except KeyError:
+        except (KeyError, ValueError):
             await message.answer(f'В вакансии на строке №{i + 1} ошибка в столбце "тип занятости"!\n'
                                  f'Заполните предоставленную форму в соответствии с требованиями и отправьте её в бот.\n')
             if os.path.isfile(f'{name_form}.xlsx'):
                 os.remove(f'{name_form}.xlsx')
             if os.path.isfile(f'{name_form}.csv'):
                 os.remove(f'{name_form}.csv')
-            break
+            continue
 
         try:
             salary = float(df.loc[i, 'размер заработной платы: руб.'])
-        except KeyError:
+        except (KeyError, ValueError):
             await message.answer(
                 f'В вакансии на строке №{i + 1} ошибка в столбце "размер заработной платы: руб."!\n'
                 f'Заполните предоставленную форму в соответствии с требованиями и отправьте её в бот.\n')
@@ -121,7 +122,7 @@ async def download_document(message: Message, bot: Bot):
                 os.remove(f'{name_form}.xlsx')
             if os.path.isfile(f'{name_form}.csv'):
                 os.remove(f'{name_form}.csv')
-            break
+            continue
 
         validated_vacancy.append(
             DAOVacancyData(employer_id=await db.get_employer_id_by_tguser_id(message.from_user.id),
@@ -138,7 +139,7 @@ async def download_document(message: Message, bot: Bot):
 
     for vacancy in validated_vacancy:
         await db.insert_vacancy(vacancy)
-    await message.answer("Файл поступил и обработан.")
+    await message.answer('Файл поступил и обработан.')
 
 
 # Этот хэндлер будет срабатывать на отправку отчетности по размещённым вакансиям
