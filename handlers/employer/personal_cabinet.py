@@ -49,9 +49,9 @@ async def process_button_load_press(callback: CallbackQuery, state: FSMContext, 
 async def download_document(message: Message, bot: Bot):
     if not os.path.exists(f'files/downloads/{message.from_user.id}'):
         os.mkdir(f'files/downloads/{message.from_user.id}')
-    if not os.path.exists(f'files/downloads/{message.from_user.id}/{message.date.strftime('%Y-%m-%d')}'):
-        os.mkdir(f'files/downloads/{message.from_user.id}/{message.date.strftime('%Y-%m-%d')}')
-    name_form = f'files/downloads/{message.from_user.id}/{message.date.strftime('%Y-%m-%d')}/{message.document.file_id}'
+    if not os.path.exists(f'files/downloads/{message.from_user.id}/{message.date.strftime("%Y-%m-%d")}'):
+        os.mkdir(f'files/downloads/{message.from_user.id}/{message.date.strftime("%Y-%m-%d")}')
+    name_form = f'files/downloads/{message.from_user.id}/{message.date.strftime("%Y-%m-%d")}/{message.document.file_id}'
     await bot.download(
         message.document,
         destination=f'{name_form}.xlsx')
