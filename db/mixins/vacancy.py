@@ -25,7 +25,7 @@ class DAOVacancyMixin:
                 if tmp:
                     vacancy = tmp
 
-                    return DAOVacancyData(
+                    vacancy_data = DAOVacancyData(
                         employer_id=vacancy.employer_id,
                         audience_id=vacancy.audience_id,
                         name=vacancy.name,
@@ -37,6 +37,8 @@ class DAOVacancyMixin:
                         date_start=vacancy.date_start,
                         date_end=vacancy.date_end
                     )
+                    vacancy_data.id = vacancy.id
+                    return vacancy_data
 
     async def get_vacancy_by_geolocation(self, longitude: float = None, latitude: float = None) -> List[DAOVacancyData]:
         """
