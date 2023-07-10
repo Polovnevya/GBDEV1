@@ -88,7 +88,7 @@ async def download_document(message: Message, bot: Bot):
                 os.remove(f'{name_form}.xlsx')
             if os.path.isfile(f'{name_form}.csv'):
                 os.remove(f'{name_form}.csv')
-            break
+            continue
 
         try:
             work_schedule = WorkScheduleEnum(df.loc[i, 'график работы'])
@@ -99,6 +99,7 @@ async def download_document(message: Message, bot: Bot):
                 os.remove(f'{name_form}.xlsx')
             if os.path.isfile(f'{name_form}.csv'):
                 os.remove(f'{name_form}.csv')
+            continue
 
         try:
             employment = EmploymentEnum(df.loc[i, 'тип занятости'])
@@ -109,7 +110,7 @@ async def download_document(message: Message, bot: Bot):
                 os.remove(f'{name_form}.xlsx')
             if os.path.isfile(f'{name_form}.csv'):
                 os.remove(f'{name_form}.csv')
-            break
+            continue
 
         try:
             salary = float(df.loc[i, 'размер заработной платы: руб.'])
@@ -121,7 +122,7 @@ async def download_document(message: Message, bot: Bot):
                 os.remove(f'{name_form}.xlsx')
             if os.path.isfile(f'{name_form}.csv'):
                 os.remove(f'{name_form}.csv')
-            break
+            continue
 
         validated_vacancy.append(
             DAOVacancyData(employer_id=await db.get_employer_id_by_tguser_id(message.from_user.id),
