@@ -47,11 +47,11 @@ async def process_button_load_press(callback: CallbackQuery, state: FSMContext, 
 @employer_pc_router.message(F.content_type == ContentType.DOCUMENT,
                             StateFilter(FSMFormEvent.lreporting))
 async def download_document(message: Message, bot: Bot):
-    if not os.path.exists(f"files/downloads/{message.from_user.id}"):
-        os.mkdir(f"files/downloads/{message.from_user.id}")
-    if not os.path.exists(f"files/downloads/{message.from_user.id}/{message.date.strftime('%Y-%m-%d')}"):
-        os.mkdir(f"files/downloads/{message.from_user.id}/{message.date.strftime('%Y-%m-%d')}")
-    name_form = f"files/downloads/{message.from_user.id}/{message.date.strftime('%Y-%m-%d')}/{message.document.file_id}"
+    if not os.path.exists(f'files/downloads/{message.from_user.id}'):
+        os.mkdir(f'files/downloads/{message.from_user.id}')
+    if not os.path.exists(f'files/downloads/{message.from_user.id}/{message.date.strftime('%Y-%m-%d')}'):
+        os.mkdir(f'files/downloads/{message.from_user.id}/{message.date.strftime('%Y-%m-%d')}')
+    name_form = f'files/downloads/{message.from_user.id}/{message.date.strftime('%Y-%m-%d')}/{message.document.file_id}'
     await bot.download(
         message.document,
         destination=f'{name_form}.xlsx')
@@ -139,7 +139,7 @@ async def download_document(message: Message, bot: Bot):
 
     for vacancy in validated_vacancy:
         await db.insert_vacancy(vacancy)
-    await message.answer("Файл поступил и обработан.")
+    await message.answer('Файл поступил и обработан.')
 
 
 # Этот хэндлер будет срабатывать на отправку отчетности по размещённым вакансиям
