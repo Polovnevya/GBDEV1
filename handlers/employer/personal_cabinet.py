@@ -81,7 +81,7 @@ async def download_document(message: Message, bot: Bot):
     for i in range(len(df)):
         try:
             audience_id = await db.get_audience_id_by_name(AudienceEnum(df.loc[i, 'специализация']))
-        except KeyError:
+        except (KeyError, ValueError):
             await message.answer(f'В вакансии на строке №{i + 1} ошибка в столбце "специализация"!\n'
                                  f'Заполните предоставленную форму в соответствии с требованиями и отправьте её в бот.\n')
             if os.path.isfile(f'{name_form}.xlsx'):
@@ -92,7 +92,7 @@ async def download_document(message: Message, bot: Bot):
 
         try:
             work_schedule = WorkScheduleEnum(df.loc[i, 'график работы'])
-        except KeyError:
+        except (KeyError, ValueError):
             await message.answer(f'В вакансии на строке №{i + 1} ошибка в столбце "График работы"!\n'
                                  f'Заполните предоставленную форму в соответствии с требованиями и отправьте её в бот.\n')
             if os.path.isfile(f'{name_form}.xlsx'):
@@ -103,7 +103,7 @@ async def download_document(message: Message, bot: Bot):
 
         try:
             employment = EmploymentEnum(df.loc[i, 'тип занятости'])
-        except KeyError:
+        except (KeyError, ValueError):
             await message.answer(f'В вакансии на строке №{i + 1} ошибка в столбце "тип занятости"!\n'
                                  f'Заполните предоставленную форму в соответствии с требованиями и отправьте её в бот.\n')
             if os.path.isfile(f'{name_form}.xlsx'):
@@ -114,7 +114,7 @@ async def download_document(message: Message, bot: Bot):
 
         try:
             salary = float(df.loc[i, 'размер заработной платы: руб.'])
-        except KeyError:
+        except (KeyError, ValueError):
             await message.answer(
                 f'В вакансии на строке №{i + 1} ошибка в столбце "размер заработной платы: руб."!\n'
                 f'Заполните предоставленную форму в соответствии с требованиями и отправьте её в бот.\n')
