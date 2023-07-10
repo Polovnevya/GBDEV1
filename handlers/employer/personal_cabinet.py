@@ -16,6 +16,7 @@ from filters.employer import IsEmployer
 from keyboards.inline.employer import get_start_employer_keyboard, EmployerLoadCB, EmployerReportingCB
 from loader import db
 from states.employer import FSMFormEvent
+from openpyxl.workbook import Workbook
 
 employer_pc_router: Router = Router()
 employer_pc_router.message.filter(IsEmployer(config.employers.employers_ids))
@@ -149,22 +150,22 @@ async def process_button_2_press(callback: CallbackQuery,
         await db.get_employer_id_by_tguser_id(callback.from_user.id))
     records2: List[ReportingVacancy] = await db.get_reporting_response_vacancy(
         await db.get_employer_id_by_tguser_id(callback.from_user.id))
-    list_name_request1 = [('id',
-                           'Наименование вакансии',
-                           'Количество опубликованных постов с вакансией',
-                           'Количество откликов на вакансию',)
-                          ]
-    list_name_request2 = [('id',
-                           'Наименование вакансии',
-                           'Количество откликов со стороны мужчин',
-                           'Количество откликов со стороны женщин',
-                           'Количество откликов кандидатов категории junior',
-                           'Количество откликов кандидатов категории middle',
-                           'Количество откликов кандидатов категории senior',
-                           'Количество откликов кандидатов со средним образованием',
-                           'Количество откликов кандидатов со средним профессиональным образованием',
-                           'Kоличество откликов кандидатов с высшим образованием')
-                          ]
+    list_name_request1 = []
+    list_name_request2 = []
+    name_title1 = [('id',
+                    'Наименование вакансии',
+                    'Количество опубликованных постов с вакансией',
+                    'Количество откликов на вакансию',)]
+    name_title2 = [('id',
+                    'Наименование вакансии',
+                    'Количество откликов со стороны мужчин',
+                    'Количество откликов со стороны женщин',
+                    'Количество откликов кандидатов категории junior',
+                    'Количество откликов кандидатов категории middle',
+                    'Количество откликов кандидатов категории senior',
+                    'Количество откликов кандидатов со средним образованием',
+                    'Количество откликов кандидатов со средним профессиональным образованием',
+                    'Kоличество откликов кандидатов с высшим образованием')]
     for i in range(len(records1)):
         list_name_request1.append((records1[i].vacancy_id,
                                    records1[i].vacancy_name,
@@ -188,28 +189,22 @@ async def process_button_2_press(callback: CallbackQuery,
     path_file_to_reporting = f'files/work/unloading/{callback.from_user.id}'
     if not os.path.exists(path_file_to_reporting):
         os.mkdir(path_file_to_reporting)
-    for i in range(len(list_name_request1)):
-        with open(f'{path_file_to_reporting}/reporting1.csv', 'a+', encoding="utf-8") as f:
-            f.write(f'{",".join(map(str, list_name_request1[i]))}\n')
-    for i in range(len(list_name_request2)):
-        with open(f'{path_file_to_reporting}/reporting2.csv', 'a+', encoding="utf-8") as f:
-            f.write(f'{",".join(map(str, list_name_request2[i]))}\n')
 
-    df = pd.read_csv(f'{path_file_to_reporting}/reporting1.csv')
-    df.to_excel(f'{path_file_to_reporting}/Отчёт.xlsx',
-                engine='openpyxl',
-                index=False,
-                sheet_name='Отчёт №1')
-    df = pd.read_csv(f'{path_file_to_reporting}/reporting2.csv')
-    with pd.ExcelWriter(f'{path_file_to_reporting}/Отчёт.xlsx',
-                        mode="a",
-                        engine="openpyxl") as writer:
-        df.to_excel(writer, index=False, sheet_name='Отчёт №2')
+    wb = Workbook()
+    list1 = wb.active
+    list1.title = 'Отчёт №1'
+    list2 = wb.create_sheet('Отчёт №2')
+    list_name_title = [name_title1, name_title2]
+    list_name_request = [list_name_request1, list_name_request2]
+    sheet_names = ['Отчёт №1', 'Отчёт №2']
+    list_sheet = [list1, list2]
+    for i in range(len(sheet_names)):
+        list_sheet[i] = wb[sheet_names[i]]
+        list_sheet[i].append(list_name_title[i][0])
+        for row in list_name_request[i]:
+            list_sheet[i].append(row)
+    wb.save(f'{path_file_to_reporting}/Отчёт.xlsx')
 
     document = FSInputFile(path=f'{path_file_to_reporting}/Отчёт.xlsx')
     await callback.message.answer(text='Отчет сформирован.')
     await bot.send_document(callback.message.chat.id, document=document)
-    with open(f'{path_file_to_reporting}/reporting1.csv', 'w') as f:
-        pass
-    with open(f'{path_file_to_reporting}/reporting2.csv', 'w') as f:
-        pass

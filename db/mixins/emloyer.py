@@ -159,14 +159,3 @@ class DAOEmployerMixin:
                         ))
         return reports
 
-        # ReportingVacancy.vacancy_id = 3,
-        # ReportingVacancy.vacancy_name = 'Вакансия тест',
-        # ReportingVacancy.male = 10,
-        # ReportingVacancy.female = 5,
-        # ReportingVacancy.junior = 7,
-        # ReportingVacancy.middle = 3,
-        # ReportingVacancy.senior = 2,
-        # ReportingVacancy.secondary = 2,
-        # ReportingVacancy.vocational = 5,
-        # ReportingVacancy.higher = 5
-
