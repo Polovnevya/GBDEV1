@@ -21,5 +21,4 @@ class DAOFeedbackMixin:
                 else:
                     feedback = tmp
                     feedback.vacancy_id = vacancy_response.vacancy_id
-                    feedback.candidate_id = vacancy_response.vacancy_id
-                    session.commit()
+                    feedback.candidate_id = vacancy_response.candidate_id
